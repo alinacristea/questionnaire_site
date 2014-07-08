@@ -1,7 +1,7 @@
 __author__ = 'alina'
 
 # import models
-from models import Answer
+from models import Likert_Scale_Answer
 
 from django.http import HttpResponse
 import logging
@@ -11,13 +11,13 @@ def index(request):
 
 def viewAnswers(request):
 
-    answer_list = Answer.objects.all()
+    answer_list = Likert_Scale_Answer.objects.all()
 
     html_list = ""
 
     for answer in answer_list :
-        parents = "<h3>" + answer.question_answer.survey.title + "</h3>"
-        parent_q = "<p><strong>" + answer.question_answer.question_description + "</strong></p>"
+        parents = "<h3>" + answer.question.survey.title + "</h3>"
+        parent_q = "<p><strong>" + answer.question.question_description + "</strong></p>"
         html_list = "<p>" + answer.choice + "</p>"
 
 
