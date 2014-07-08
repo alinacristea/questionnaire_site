@@ -94,7 +94,7 @@ class Text_Answer(models.Model):
 
 class Boolean_Answer(models.Model):
     user = models.ForeignKey(Participant)
-    question = models.ForeignKey(Question, limit_choices_to={'question_type': 'yes / no'})
+    question = models.ForeignKey(Question, limit_choices_to={'question_type': 'yes / no'},null=False,blank=False)
 
     text = models.BooleanField(verbose_name="agree")
 
