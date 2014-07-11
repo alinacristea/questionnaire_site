@@ -4,10 +4,7 @@ __author__ = 'alina'
 from models import Likert_Scale_Answer, Text_Answer, Boolean_Answer, Participant, Question, Survey
 
 from django.http import HttpResponse
-from django.template import RequestContext
 from django.shortcuts import render_to_response
-import logging
-import urlparse
 
 def add_likert_scale_answer(user, question, choice):
     l_s_a = Likert_Scale_Answer.objects.get_or_create(user=user,
@@ -15,7 +12,7 @@ def add_likert_scale_answer(user, question, choice):
     return l_s_a
 
 def index(request):
-    return HttpResponse("hello world!")
+    return HttpResponse("hello alina")
 
 def viewAnswers(request):
 
@@ -44,9 +41,14 @@ def viewAnswers(request):
     # answer = Likert_Scale_Answer.objects.get(user=participant, question=question)
     # list.append("<p>" + (answer) + "</p>")
 
-
+    context_dict = {'likertresults' : likertresults,
+                    'textresults' : textresults,
+                    'booleanresults' : booleanresults,
+                    'survey' : survey,
+                    "participant" : participant}
 
     # http://127.0.0.1:8000/view_answers/?survey=Survey4&email=partici4@gmail.com
 
-    return HttpResponse(str(list))
-    # return render_to_response('survey.html')
+    # return HttpResponse(str(list), survey)
+    return render_to_response('survey.html',
+                              context_dict, )

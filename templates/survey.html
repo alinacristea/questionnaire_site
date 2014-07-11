@@ -2,10 +2,40 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title></title>
-    <p>hi2u</p>
+    <title>{{ survey }} -  Results for {{ participant }}</title>
 </head>
 <body>
+<h1>{{ survey }} -  Results for {{ participant }}</h1>
+
+
+<h2>Likert Results</h2>
+<hr>
+{% for likertresult in likertresults %}
+<p><b>{{ likertresult.question }}</b></p>
+<p>{{ likertresult }}</p>
+<hr>
+{% endfor %}
+
+
+<h2>Boolean Results</h2>
+<hr>
+{% for booleanresult in booleanresults %}
+<p><b>{{ booleanresult.question }}</b></p>
+<p>{{ booleanresult }}</p>
+<hr>
+{% endfor %}
+
+
+<h2>Text Results</h2>
+<hr>
+{% for textresult in textresults %}
+<p><b>{{ textresult.question }}</b></p>
+<p>{{ textresult }}</p>
+<hr>
+{% endfor %}
+
+
+
 
 </body>
 </html>
