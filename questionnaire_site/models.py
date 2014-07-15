@@ -7,8 +7,8 @@ import datetime
 
 class Survey(models.Model):
     user = models.ForeignKey(User, verbose_name="Author")
-    title = models.CharField(max_length=400, unique=True)
-    description = models.TextField(max_length=400)
+    title = models.CharField(max_length=128, unique=True)
+    description = models.CharField(max_length=128)
     deadline = models.DateField(null=True)
 
     def clean(self):
@@ -29,9 +29,9 @@ class Question(models.Model):
                       (TEXT, 'text'),
                       (BOOLEAN, 'yes / no')
     )
-    question_description = models.TextField(max_length=128)
+    question_description = models.CharField(max_length=128)
     survey = models.ForeignKey(Survey)
-    question_type = models.CharField(max_length=200, choices=QUESTION_TYPES)
+    question_type = models.CharField(max_length=128, choices=QUESTION_TYPES)
 
     def __unicode__(self):
         return (self.question_description)
@@ -40,7 +40,7 @@ class Question(models.Model):
 class Participant(models.Model):
     # what if they change their email @TODO
     email = models.EmailField(max_length=128, null=False, unique=True)
-    birth_date = models.DateField(max_length=20, null=False)
+    birth_date = models.DateField(max_length=128, null=False)
     GENDER = (
         ('Male', 'male'),
         ('Female', 'female'),
@@ -78,7 +78,7 @@ class Likert_Scale_Answer(models.Model):
 class Text_Answer(models.Model):
     user = models.ForeignKey(Participant)
     question = models.ForeignKey(Question, limit_choices_to={'question_type': 'text'})
-    text = models.TextField(max_length=512)
+    text = models.CharField(max_length=128)
 
     def clean(self):
         from django.core.exceptions import ValidationError

@@ -61,7 +61,7 @@ def populate():
         else:
             gender = "Female"
 
-        add_participant("partici" + s + "@gmail.com", "1985-03-04", gender)
+        add_participant("participant" + s + "@gmail.com", "1985-03-04", gender)
 
     for i in range(10):
         uid = str(i / 4)
@@ -85,7 +85,7 @@ def populate():
 
         for question in questions:
             type = question.question_type
-            pid = Participant.objects.get(email="partici" + str(i) + "@gmail.com")
+            pid = Participant.objects.get(email="participant" + str(i) + "@gmail.com")
 
             if type == "likert":
                 add_likert_scale_answer(pid, question, random.randint(0, 4))
@@ -96,16 +96,6 @@ def populate():
             if type == "yes / no":
                 add_boolean_answer(pid, question, bool(random.getrandbits(1)))
 
-
-
-
-
-
-
-
-
-
-
 # Start execution here!
 if __name__ == '__main__':
     print "Starting population script..."
@@ -113,8 +103,7 @@ if __name__ == '__main__':
     from questionnaire_site.models import Survey, Question, \
         Likert_Scale_Answer, Text_Answer, Boolean_Answer, Participant
 
-    from django.contrib.auth.models import Group, BaseUserManager, Permission, User, UserManager, AbstractUser, \
-        PermissionManager, PermissionsMixin, GroupManager
+    from django.contrib.auth.models import User
 
     populate()
 

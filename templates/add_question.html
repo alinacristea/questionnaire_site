@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Add a question</title>
+</head>
+<body>
+    <form id="question_form" method="post" action="/questionnaire_site/add_question/">
+
+
+            {% csrf_token %}
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+
+            {% for field in form.visible_fields %}
+                {{ field.errors }}
+                {{ field.help_text }}
+                {{ field.all }}
+            {% endfor %}
+
+            <input type="submit" name="submit" value="Add Question" />
+        </form>
+
+</body>
+</html>
