@@ -77,6 +77,9 @@ USE_L10N = True
 
 USE_TZ = True
 
+# web accessible folder
+STATIC_ROOT = (BASE_DIR + '/static')
+print(STATIC_ROOT)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/

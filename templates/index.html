@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Psychometric Questionnaires</title>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+  <h1>Questionnaire Site</h1>
+  <br>
+  <div class="container">
+
+        <p><a href="/add_survey/">Create Survey</a></p>
+        <p><a href="/add_question/">Add Question</a></p>
+        <p><a href="/add_participant/">Add Participant</a></p>
+
+    <b><a href="http://127.0.0.1:8000/view_survey/?survey=Survey9">Latest added Survey</a></b>
+
+      <br/>
+  </div>
+</div>
+</body>
+</html>
+
+{% endblock %}
