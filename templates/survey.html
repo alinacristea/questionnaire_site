@@ -1,14 +1,17 @@
 {% extends 'base.html' %}
 
 {% block title %}
-<title>Psychometric Questionnaires</title>
+<title xmlns="http://www.w3.org/1999/html">Psychometric Questionnaires</title>
 {% endblock %}
 
 {% block content %}
-<div class="hero-unit">
+<div class="highlight">
+
 
 <h1>{{ survey }}</h1>
 <p>{{ survey.description }}</p>
+
+
 
 <h2>Answer the following questions</h2>
 <hr>
@@ -17,5 +20,103 @@
 <!--<p>{{ text_result }}</p>-->
 <hr>
 {% endfor %}
+
+
+<div class="alert-area"></div>
+
+  <form class="span6" id="question_form" method="post" action="/add_question/">
+    {% csrf_token %}
+    {% for hidden in form.hidden_fields %}
+    {{ hidden }}
+    {% endfor %}
+
+    {% for field in form.visible_fields %}
+    {{ field.errors }}
+    <p>{{ field.help_text }} </p>
+    {{ field }}
+    {% endfor %}
+    <br/>
+    <button id="submit" class="btn btn-primary" type="submit" name="submit">Create Question</button>
+  </form>
+
+  <script>
+
+//    $('form').on('submit', function(ev) {
+//      ev.preventDefault();
+//
+//      this.submit;
+//    });
+
+    var alertArea = $('.alert-area');
+    var form = $('form#question_form');
+    var desc = $('#id_question_description');
+    var survey_select = $('#id_survey');
+    var checkboxValue;
+    var count = 0;
+    var survey = $('h1').html();
+
+
+
+
+$('#id_survey option').filter(function() {
+  return ($(this).text() == survey); //To select Blue
+}).prop('selected', true);
+
+
+
+// http://stackoverflow.com/questions/786142/how-to-retrieve-checkboxes-values-in-jquery
+$('input[type="radio"]').click(function() {
+  if($(this).is(':checked')) {
+
+    checkboxValue = this.getAttribute("value");
+    console.log(checkboxValue);
+  }
+});
+
+
+// http://stackoverflow.com/questions/1200266/submit-a-form-using-jquery
+$(form).submit( function() {
+  $.ajax({
+    url: '/add_question/',
+    type: 'post',
+    data: $('form#question_form').serialize(),
+    complete:function(){
+//      alert("complete");
+    },
+    success: function(data) {
+
+
+
+      if (data != "Created Question") {
+        console.log("failed!!!")
+
+        $('.alert').remove();
+        alertArea.prepend('<div class="alert alert-danger">Add Question failed. Please try again later.</div>');
+        $('.alert').delay(2000).fadeOut(2000);
+
+      }
+      else {
+        console.log("it worked!")
+        alertArea.before('<p id="added' + count + '"><b>' + desc.val() +'</b> Type: ' + checkboxValue  + '</p><hr>');
+        alertArea.prepend('<div class="alert alert-success">Added Question!</div>')
+        $('.alert').delay(2000).fadeOut(2000);
+        count++;
+
+        desc.val("")
+        desc.focus();
+
+      }
+    }
+  });
+
+  return false; //prevents default action of form submit
+
+});
+
+  </script>
+
 </div>
+
+
+
 {% endblock %}

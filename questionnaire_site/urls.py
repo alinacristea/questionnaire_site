@@ -17,9 +17,4 @@ urlpatterns = patterns('',
 
 
 
-
-    # url(r'^add_likert_scale_answer/$', views.add_likert_scale_answer, name='add_likert_scale_answer'),
-
-
-
 )

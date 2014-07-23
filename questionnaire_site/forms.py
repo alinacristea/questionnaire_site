@@ -46,6 +46,11 @@ class ParticipantForm(forms.ModelForm):
         model = Participant
         fields = ('email', 'birth_date', 'gender')
 
+
+
+
+
+
 #         in my 'models' the choice is an IntegerField
 
 # class Likert_Scale_Answer_Form(forms.ModelForm):

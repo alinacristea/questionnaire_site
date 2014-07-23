@@ -9,6 +9,8 @@
     <link href="{% static 'css/bootstrap-fluid-adj.css' %}" rel="stylesheet">
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" media="screen">
     <link href="{% static 'css/bootstrap-responsive.min.css' %}" rel="stylesheet">
+      <link href="{% static 'css/bootstrap-theme.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/questionnaire-site.css' %}" rel="stylesheet">
 
       <script src="{% static 'js/jquery-2.1.0.min.js' %}"></script>
       <script src="{% static 'js/bootstrap.min.js' %}"></script>
@@ -28,7 +30,7 @@
                             <span class="icon-bar"></span>
                         </button>
 
-                      {% block content %} {% endblock %}
+
 
 
            <div class="nav-collapse collapse">
@@ -42,13 +44,16 @@
 {#                <li><a href="/register/">Register Here</a></li>#}
 {#                <li><a href="/login/">Login</a></li>#}
 {#            {% endif %}#}
-
-                <li><a href="/index/">Main page</a></li>
+{##}
+{#                <li><a href="/index/">Main page</a></li>#}
             </ul>
         </div>
        </div>
       </div>
      </div>
+          <div class="container">
+          {% block content %} {% endblock %}
+            </div>
     </div>
 
     </body>
