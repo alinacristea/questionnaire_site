@@ -1,28 +1,29 @@
 {% extends 'base.html' %}
 
-{% block title %}
-<title xmlns="http://www.w3.org/1999/html">Psychometric Questionnaires</title>
-{% endblock %}
+{#{% block title %}#}
+{#<title xmlns="http://www.w3.org/1999/html">Psychometric Questionnaires</title>#}
+{#{% endblock %}#}
 
 {% block content %}
+<div id="view_survey">
 <div class="highlight">
 
 
 <h1>{{ survey }}</h1>
 <p>{{ survey.description }}</p>
 
-
-
-<h2>Answer the following questions</h2>
 <hr>
-{% for question in questions %}
-<p><b>{{ question.question_description }}</b> Type: {{ question.question_type }}</p>
-<!--<p>{{ text_result }}</p>-->
+    {% for question in questions %}
+        <p><b>{{ question.question_description }}</b> Type: {{ question.question_type }}</p>
+        <!--<p>{{ text_result }}</p>-->
 <hr>
-{% endfor %}
+    {% endfor %}
 
 
 <div class="alert-area"></div>
+
+</div>
+
 
   <form class="span6" id="question_form" method="post" action="/add_question/">
     {% csrf_token %}
@@ -38,14 +39,9 @@
     <br/>
     <button id="submit" class="btn btn-primary" type="submit" name="submit">Create Question</button>
   </form>
+</div>
 
-  <script>
-
-//    $('form').on('submit', function(ev) {
-//      ev.preventDefault();
-//
-//      this.submit;
-//    });
+      <script>
 
     var alertArea = $('.alert-area');
     var form = $('form#question_form');
@@ -54,8 +50,6 @@
     var checkboxValue;
     var count = 0;
     var survey = $('h1').html();
-
-
 
 
 $('#id_survey option').filter(function() {
@@ -114,9 +108,5 @@ $(form).submit( function() {
 });
 
   </script>
-
-</div>
-
-
 
 {% endblock %}

@@ -1,26 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title>Add Likert Scale Answer</title>
-</head>
-<body>
-    <form id="likert_scale_answer_form" method="post" action="/questionnaire_site/add_likert_scale_answer/">
+{% extends 'base.html' %}
 
+{% block content %}
+    <h1>Add Likert Scale Answer</h1>
+    <br>
+    <div class="container">
 
-            {% csrf_token %}
-            {% for hidden in form.hidden_fields %}
-                {{ hidden }}
-            {% endfor %}
+     <form class="span6" id="likert_scale_answer_form" method="post" action="/add_likert_scale_answer/">
+         {% csrf_token %}
+         {% for hidden in form.hidden_fields %}
+         {{ hidden }}
+         {% endfor %}
 
-            {% for field in form.visible_fields %}
-                {{ field.errors }}
-                {{ field.help_text }}
-                {{ field }}
-            {% endfor %}
+          {% for field in form.visible_fields %}
+          {{ field.errors }}
+          <p>{{ field.help_text }} </p>
+          {{ field }}
+          {% endfor %}
 
-            <input type="submit" name="submit" value="Add Likert Scale Answer" />
-        </form>
+      <br>
+        <button class="btn btn-primary" type="submit" name="submit">Create Likert Answer</button>
+      </form>
+    </div>
+{% endblock %}
 
-</body>
-</html>

@@ -2,7 +2,8 @@ __author__ = 'alina'
 
 from django import forms
 import datetime
-from questionnaire_site.models import Survey, Question, User, Participant, Likert_Scale_Answer
+from django.contrib.auth.models import User
+from questionnaire_site.models import Survey, Question, User, Participant, Likert_Scale_Answer, Text_Answer, Boolean_Answer
 
 
 class SurveyForm(forms.ModelForm):
@@ -36,8 +37,7 @@ class QuestionForm(forms.ModelForm):
 
 class ParticipantForm(forms.ModelForm):
     email = forms.EmailField(max_length=128, help_text="Enter your email")
-    birth_date = forms.DateField(
-                    help_text="Enter your Date of Birth")
+    birth_date = forms.DateField(help_text="Enter your Date of Birth")
     gender = forms.ChoiceField(required=True, widget=forms.RadioSelect,
                                     choices=Participant.GENDER,
                                     help_text="Choose your gender")
@@ -48,21 +48,48 @@ class ParticipantForm(forms.ModelForm):
 
 
 
+class Likert_Scale_Answer_Form(forms.ModelForm):
+    user = forms.ModelChoiceField(queryset=Participant.objects.all(),
+                                  help_text="Select Participant")
+    question = forms.ModelChoiceField(queryset=Question.objects.filter(question_type='likert'),
+                                      help_text="Select the question")
+    choice = forms.ChoiceField(required=True, widget=forms.RadioSelect,
+                                choices=Likert_Scale_Answer.CHOICES,
+                                help_text="Choose your answer")
+    class Meta:
+        model = Likert_Scale_Answer
+        fields = ('user', 'question', 'choice')
 
 
+class Text_Answer_Form(forms.ModelForm):
+    user = forms.ModelChoiceField(queryset=Participant.objects.all(),
+                                  help_text="Select Participant")
+    question = forms.ModelChoiceField(queryset=Question.objects.filter(question_type='text'),
+                                      help_text="Select the question")
+    text = forms.CharField(max_length=128, help_text="Enter the question's answer")
 
-#         in my 'models' the choice is an IntegerField
+    class Meta:
+        model = Text_Answer
+        fields = ('user', 'question', 'text')
 
-# class Likert_Scale_Answer_Form(forms.ModelForm):
-#     user = forms.ModelChoiceField(queryset=User.objects.all(),
-#                                   help_text="Select User/participant")
-#     question = forms.ModelChoiceField(queryset=Question.objects.filter(question_type = 'likert'),
-#                                       help_text="Select the question")
-#     choice = forms.IntegerField(required=True, widget=forms.RadioSelect,
-#                                 # choices=Likert_Scale_Answer.CHOICES,
-#                                 help_text="Choose your answer")
+
+class Boolean_Answer_Form(forms.ModelForm):
+    user = forms.ModelChoiceField(queryset=Participant.objects.all(),
+                                  help_text="Select Participant")
+    question = forms.ModelChoiceField(queryset=Question.objects.filter(question_type='yes / no'),
+                                      help_text="Select the question")
+    text = forms.BooleanField(required=False, help_text="Do you agree? If yes, check the box below!")
+
+    class Meta:
+        model = Boolean_Answer
+        fields = ('user', 'question', 'text')
+
+# class Survey_Answers_Form(forms.Form):
+
+# class UserForm(forms.ModelForm):
+#     password = forms.CharField(widget=forms.PasswordInput())
+#
 #     class Meta:
-#         model = Likert_Scale_Answer
-#         fields = ('user', 'question', 'choice')
+#         model = User
+#         fields = ('username', 'password')
 
-# choice = models.IntegerField(max_length=2, choices=CHOICES)

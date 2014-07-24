@@ -47,7 +47,7 @@ class Participant(models.Model):
         ('Other', 'other'),
     )
     gender = models.CharField(max_length=128, choices=GENDER)
-    # validated = models.BooleanField() @TODO
+    # validated_email = models.BooleanField() @TODO
     def __unicode__(self):
         return (self.email)
 
@@ -56,11 +56,11 @@ class Likert_Scale_Answer(models.Model):
     user = models.ForeignKey(Participant)
     question = models.ForeignKey(Question, limit_choices_to={'question_type': 'likert'})
     CHOICES = (
-        (1, 'Strongly Disagree'),
-        (2, 'Disagree'),
-        (3, 'Neither agree nor disagree'),
-        (4, 'Agree'),
-        (5, 'Strongly Agree') )
+        (0, 'Strongly Disagree'),
+        (1, 'Disagree'),
+        (2, 'Neither agree nor disagree'),
+        (3, 'Agree'),
+        (4, 'Strongly Agree') )
     choice = models.IntegerField(max_length=2, choices=CHOICES)
 
     def clean(self):
@@ -73,7 +73,8 @@ class Likert_Scale_Answer(models.Model):
                 raise ValidationError("You may not answer the same question more than once.")
 
     def __unicode__(self):
-        return str(self.CHOICES[self.choice])
+        return str(self.CHOICES[self.choice]) + " - " + self.user.email
+        # return (str(self.CHOICES[self.choice]))
 
 class Text_Answer(models.Model):
     user = models.ForeignKey(Participant)
@@ -94,7 +95,7 @@ class Text_Answer(models.Model):
 
 class Boolean_Answer(models.Model):
     user = models.ForeignKey(Participant)
-    question = models.ForeignKey(Question, limit_choices_to={'question_type': 'yes / no'},null=False,blank=False)
+    question = models.ForeignKey(Question, limit_choices_to={'question_type': 'yes / no'}, null=False, blank=False)
 
     text = models.BooleanField(verbose_name="agree")
 

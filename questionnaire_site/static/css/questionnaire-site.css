@@ -1,0 +1,32 @@
+form ul {
+  list-style-type: none;
+  margin-left: 0;
+}
+
+.alert-area {
+  height: 58px;
+}
+
+#view_survey #id_question_description + p, #view_survey #id_survey {
+  display: none;
+}
+
+#question_form {
+    display: block;
+    float: right;
+    width: 300px;
+    position: fixed;
+    right: 0;
+    top: 100px;
+}
+
+.highlight {
+    display: block;
+    float: left;
+    width: 300px;
+}
+
+
+input[type="checkbox"] {
+    margin-bottom: 1em;
+}

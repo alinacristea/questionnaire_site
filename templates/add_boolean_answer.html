@@ -1,16 +1,11 @@
-
 {% extends 'base.html' %}
 
-{% block title %}
-    <title>Add Questions</title>
-{% endblock %}
-
 {% block content %}
-    <h1>Add Question</h1>
-    <br>
+    <h1>Add Boolean Answer</h1>
+
     <div class="container">
 
-     <form class="span6" id="question_form" method="post" action="/add_question/">
+     <form class="span6" id="boolean_answer_form" method="post" action="/add_boolean_answer/">
          {% csrf_token %}
          {% for hidden in form.hidden_fields %}
          {{ hidden }}
@@ -20,11 +15,11 @@
           {{ field.errors }}
           <p>{{ field.help_text }} </p>
           {{ field }}
-        {% endfor %}
-     <br/>
-        <button class="btn btn-primary" type="submit" name="submit">Create Question</button>
+          {% endfor %}
+        <br>
+        <button class="btn btn-primary" type="submit" name="submit">Create Boolean Answer</button>
+
       </form>
     </div>
 {% endblock %}
-
 
