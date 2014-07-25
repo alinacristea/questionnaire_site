@@ -1,5 +1,7 @@
 __author__ = 'alina'
 
+# http://www.tangowithdjango.com/book/chapters/models.html
+
 import os
 import random
 

@@ -1,9 +1,12 @@
+{#http://www.tangowithdjango.com/book/chapters/templates.html#}
+
 <!DOCTYPE html>
 {% load staticfiles %}
 <html>
     <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+{#    http://www.tangowithdjango.com/book/chapters/bootstrap.html#}
 
     <link href="{% static 'css/bootstrap-fluid-adj.css' %}" rel="stylesheet">
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" media="screen">
@@ -15,7 +18,7 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
       <!--<script src="/questionnaire_site/static/js/bootstrap-datepicker.js"></script>-->
 
-    <title>Quick Survey{% block title %}Surveys for researchers in psychometric field{% endblock %}</title>
+    <title>Quick Survey - {% block title %} Surveys for researchers in psychometric field{% endblock %}</title>
     </head>
 
     <body>

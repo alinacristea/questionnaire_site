@@ -12,10 +12,12 @@ from questionnaire_site.forms import SurveyForm, QuestionForm, ParticipantForm, 
 
 from django.contrib.auth import authenticate, login, logout
 
+# Create a view for the Home Page
 def index(request):
     context = RequestContext(request)
     return render_to_response('index.html', context)
 
+# Creating a view for a completed questionnaire, including the participant who answered the questions and their answers
 def viewAnswers(request):
 
     survey_id = request.GET.get('survey', '')
@@ -53,7 +55,7 @@ def viewAnswers(request):
 
     return render_to_response('survey.html',
                               context_dict, )
-
+# http://www.tangowithdjango.com/book/chapters/forms.html
 def viewSurvey(request):
     survey_id = request.GET.get('survey', '') # based on survey title
     survey = Survey.objects.get(title=survey_id)
@@ -74,26 +76,38 @@ def viewSurvey(request):
                               context_dict,
                               context)
 
+# Create a view to add a new survey
 def add_survey(request):
+    # Get the context from the request.
     context = RequestContext(request)
-
+    # A HTTP POST?
     if request.method == 'POST':
         form = SurveyForm(request.POST)
+        # Have we been provided with a valid form?
         if form.is_valid():
+
+
             # user = form.cleaned_data['user']
             # title = form.cleaned_data['title']
             # description = form.cleaned_data['description']
             # deadline = form.cleaned_data['deadline']
             # Survey.objects.create(user=user, title=title, description=description, deadline=deadline)
+
+
+            # Save the new survey to the database.
             form.save(commit = True)
             return HttpResponseRedirect('/view_survey/?survey=' + form.cleaned_data['title'])
         else:
+            # The supplied form contained errors - just print them to the terminal.
             print form.errors
     else:
+        # If the request was not a POST, display the form to enter details.
         form = SurveyForm()
+    # Bad form (or form details), no form supplied...
+    # Render the form with error messages (if any).
     return render_to_response('add_survey.html', {'form': form}, context)
 
-
+# Create a view to add a new question
 def add_question(request):
     context = RequestContext(request)
     if request.method == 'POST':
@@ -108,7 +122,7 @@ def add_question(request):
         form = QuestionForm()
     return render_to_response('add_question.html', {'form': form}, context)
 
-
+# Create a view to add a new participant
 def add_participant(request):
     context = RequestContext(request)
 
@@ -124,7 +138,7 @@ def add_participant(request):
         form = ParticipantForm()
     return render_to_response('add_participant.html', {'form': form}, context)
 
-
+# Create a view to add a likert-scale answer
 def add_likert_scale_answer(request):
     context = RequestContext(request)
 
@@ -140,7 +154,7 @@ def add_likert_scale_answer(request):
 
     return render_to_response('add_likert_scale_answer.html', {'form': form}, context)
 
-
+# Create a view to add a text answer
 def add_text_answer(request):
     context = RequestContext(request)
 
@@ -157,7 +171,7 @@ def add_text_answer(request):
 
     return render_to_response('add_text_answer.html', {'form': form}, context)
 
-
+# Create a view to add a boolean answer
 def add_boolean_answer(request):
     context = RequestContext(request)
 
@@ -174,7 +188,7 @@ def add_boolean_answer(request):
 
     return render_to_response('add_boolean_answer.html', {'form': form}, context)
 
-
+# http://www.tangowithdjango.com/book/chapters/login.html - Create a view for login functionality
 def user_login(request):
     context = RequestContext(request)
 
@@ -213,8 +227,7 @@ def user_login(request):
         # blank dictionary object...
         return render_to_response('login.html', {}, context)
 
-
-# login_required
+# http://www.tangowithdjango.com/book/chapters/login.html - Create a view for logout functionality
 def user_logout(request):
     # Since we know the user is logged in, we can now just log them out.
     logout(request)

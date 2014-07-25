@@ -1,5 +1,7 @@
 __author__ = 'alina'
 
+# http://www.tangowithdjango.com/book/chapters/forms.html
+
 from django import forms
 import datetime
 from django.contrib.auth.models import User
@@ -17,8 +19,11 @@ class SurveyForm(forms.ModelForm):
     deadline = forms.DateField(initial=datetime.date.today(),
                                help_text="Enter the deadline for the survey")
 
+    # An inline class to provide additional information on the form.
     class Meta:
+        # Provide an association between the ModelForm and a model
         model = Survey
+        # Fields that we want to include in our form
         fields = ('user', 'title', 'description', 'deadline')
 
 

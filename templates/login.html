@@ -1,23 +1,36 @@
+{#http://www.tangowithdjango.com/book/chapters/login.html#}
+{#http://www.tangowithdjango.com/book/chapters/bootstrap.html#}
+
 {% extends 'base.html' %}
 
 {% block title %}
-    <title>Quick Survey</title>
+  <title>Quick Survey: Login</title>
 {% endblock %}
 
 {% block content %}
-    <h1>Login to the survey website </h1>
-    <br>
+  <div class="hero-unit">
+    <h1>Login to Quick Survey</h1>
+
     <div class="container">
+      <form class="form-signin span4" id="login_form" method="post" action="/login/">
+        {% csrf_token %}
 
-      <form id="login_form" method="post" action="/login/">
-            {% csrf_token %}
-            Username: <input type="text" name="username" value="" size="50" />
-            <br />
-            Password: <input type="password" name="password" value="" size="50" />
-            <br />
+        {% if bad_details %}
+          <p><strong>Your username and/or password were incorrect!</strong></p>
+        {% elif disabled_account %}
+          <p><strong>Your account is currently disabled; we can't log you
+            in!</strong></p>
+        {% endif %}
 
-            <input type="submit" value="submit" />
+        Username: <input type="text" class="input-block-level" placeholder="Username" name="username"
+                         value="" size="50"/>
+        <br/>
+        Password: <input type="password" class="input-block-level"
+                         placeholder="Password" name="password" value="" size="50"/>
+        <br/>
+        <button class="btn btn-primary" type="submit">Sign in</button>
       </form>
-</div>
 
+    </div>
+  </div>
 {% endblock %}
