@@ -18,7 +18,8 @@ urlpatterns = patterns('',
     url(r'^add_text_answer/$', views.add_text_answer, name='add_text_answer'),
     url(r'^add_boolean_answer/$', views.add_boolean_answer, name='add_boolean_answer'),
 
-    # url(r'^register/$', views.register, name='register'),
+    url(r'^login/$', views.user_login, name='login'),
+    url(r'^logout/$', views.user_logout, name='logout'),
 
 
 )

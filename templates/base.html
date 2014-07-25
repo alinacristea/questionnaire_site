@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 {% load staticfiles %}
 <html>
@@ -9,14 +8,14 @@
     <link href="{% static 'css/bootstrap-fluid-adj.css' %}" rel="stylesheet">
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" media="screen">
     <link href="{% static 'css/bootstrap-responsive.min.css' %}" rel="stylesheet">
-      <link href="{% static 'css/bootstrap-theme.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap-theme.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/questionnaire-site.css' %}" rel="stylesheet">
 
-      <script src="{% static 'js/jquery-2.1.0.min.js' %}"></script>
-      <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery-2.1.0.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
       <!--<script src="/questionnaire_site/static/js/bootstrap-datepicker.js"></script>-->
 
-    <title>Survey website - {% block title %}Allow researchers to send questionnaires to participants!{% endblock %}</title>
+    <title>Quick Survey{% block title %}Surveys for researchers in psychometric field{% endblock %}</title>
     </head>
 
     <body>
@@ -30,30 +29,35 @@
                             <span class="icon-bar"></span>
                         </button>
 
-           <div class="nav-collapse collapse">
-               <ul class="nav pull-right">
-{#            {% if user.is_authenticated %}#}
-{#                <li><a href="/logout/">Logout</a></li>#}
-                <li><a href="/add_survey/">Add a Survey</a></li>
-                <li><a href="/add_question/">Add a Question</a></li>
-                <li><a href="/add_participant/">Add a Participant</a></li>
-                <li><a href="/">Home</a></li>
+                    <div class="nav-collapse collapse">
+                        <div class="nav pull-right">
+                        <span class="span1">
+                            <a href="/" class="btn">Home</a>
+                        </span>
+                            {% if user.is_authenticated %}
+                                <span class="span4">
+                                <span class="btn btn-inverse disabled"> Hello, {{ user.username }}!</span>
 
-{#            {% else %}#}
-{#                <li><a href="/register/">Register Here</a></li>#}
-{#                <li><a href="/login/">Login</a></li>#}
-{#            {% endif %}#}
-{##}
-{#                <li><a href="/index/">Main page</a></li>#}
-            </ul>
-        </div>
-       </div>
-      </div>
-     </div>
-          <div class="container">
-          {% block content %} {% endblock %}
+                                <a class="btn btn-inverse" href="/logout/">Logout</a>
+                                    </span>
+                                    <div class="needle span6 text-left">
+                                        <div class="btn-group">
+                                            <a href="/add_survey/" class="btn">Add a Survey</a>
+                                            <a href="/add_question/" class="btn">Add a Question</a>
+                                            <a href="/add_participant/" class="btn">Add a Participant</a>
+                                        </div>
+                                    </div>
+                            {% else %}
+                                <a href="/login/" class="btn">Login</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    </div>
+                </div>
             </div>
-    </div>
-
+        <div class="container">
+          {% block content %} {% endblock %}
+        </div>
+        </div>
     </body>
 </html>
