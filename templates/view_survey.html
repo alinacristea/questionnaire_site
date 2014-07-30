@@ -1,9 +1,5 @@
 {% extends 'base.html' %}
 
-{#{% block title %}#}
-{#<title xmlns="http://www.w3.org/1999/html">Psychometric Questionnaires</title>#}
-{#{% endblock %}#}
-
 {% block content %}
 <div id="view_survey">
 <div class="highlight">
@@ -23,7 +19,6 @@
 <div class="alert-area"></div>
 
 </div>
-
 
   <form class="span6" id="question_form" method="post" action="/add_question/">
     {% csrf_token %}

@@ -7,8 +7,7 @@ from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, RequestContext
 from questionnaire_site.forms import SurveyForm, QuestionForm, ParticipantForm, \
-    Likert_Scale_Answer_Form, Text_Answer_Form, Boolean_Answer_Form\
-    # , UserForm
+    Likert_Scale_Answer_Form, Text_Answer_Form, Boolean_Answer_Form
 
 from django.contrib.auth import authenticate, login, logout
 
@@ -17,8 +16,10 @@ def index(request):
     context = RequestContext(request)
     return render_to_response('index.html', context)
 
-# Creating a view for a completed questionnaire, including the participant who answered the questions and their answers
+# Creating a view for a completed questionnaire, including the participant
+# who answered the questions and their answers
 def viewAnswers(request):
+    context = RequestContext(request)
 
     survey_id = request.GET.get('survey', '')
     email_id = request.GET.get('email', '')
@@ -42,29 +43,31 @@ def viewAnswers(request):
 
     for answer in boolean_results:
         list.append("<p>"  + str(answer.question.question_description) + " " + str(answer.text) + "</p>")
-
-
     context_dict = {'likert_results': likert_results,
                     'text_results': text_results,
                     'boolean_results': boolean_results,
                     'survey': survey,
                     'participant': participant}
-
     # http://127.0.0.1:8000/view_answers/?survey=Survey4&email=participant4@gmail.com
-    # Population script: participant X & survey X with answers in the x0-x9 range (participant9, survey9, answers 90-99)
+    # Population script: participant X & survey X with answers in the x0-x9 range
+    # (participant9, survey9, answers 90-99)
 
-    return render_to_response('survey.html',
-                              context_dict, )
+    return render_to_response('view_answers.html', context_dict, context)
+
 # http://www.tangowithdjango.com/book/chapters/forms.html
 def viewSurvey(request):
+    context = RequestContext(request)
+
     survey_id = request.GET.get('survey', '') # based on survey title
     survey = Survey.objects.get(title=survey_id)
+
     questions = Question.objects.filter(survey=survey)
-    context = RequestContext(request)
+
     form = QuestionForm()
     context_dict = {'questions': questions,
                     'survey': survey,
                     'form': form}
+
     if request.method == 'POST':
         form = QuestionForm(request.POST)
         if form.is_valid():
@@ -72,9 +75,7 @@ def viewSurvey(request):
             return HttpResponse ("done")
         else:
             print form.errors
-    return render_to_response('survey.html',
-                              context_dict,
-                              context)
+    return render_to_response('view_survey.html', context_dict, context)
 
 # Create a view to add a new survey
 def add_survey(request):
@@ -125,7 +126,6 @@ def add_question(request):
 # Create a view to add a new participant
 def add_participant(request):
     context = RequestContext(request)
-
     if request.method == 'POST':
         form = ParticipantForm(request.POST)
         if form.is_valid():
@@ -141,7 +141,6 @@ def add_participant(request):
 # Create a view to add a likert-scale answer
 def add_likert_scale_answer(request):
     context = RequestContext(request)
-
     if request.method == 'POST':
         form = Likert_Scale_Answer_Form(request.POST)
         if form.is_valid():
@@ -157,7 +156,6 @@ def add_likert_scale_answer(request):
 # Create a view to add a text answer
 def add_text_answer(request):
     context = RequestContext(request)
-
     if request.method == 'POST':
         form = Text_Answer_Form(request.POST)
         if form.is_valid():
@@ -174,7 +172,6 @@ def add_text_answer(request):
 # Create a view to add a boolean answer
 def add_boolean_answer(request):
     context = RequestContext(request)
-
     if request.method == 'POST':
         form = Boolean_Answer_Form(request.POST)
         if form.is_valid():
@@ -188,7 +185,63 @@ def add_boolean_answer(request):
 
     return render_to_response('add_boolean_answer.html', {'form': form}, context)
 
-# http://www.tangowithdjango.com/book/chapters/login.html - Create a view for login functionality
+
+def add_response(request):
+    context = RequestContext(request)
+    if request.method == 'POST':
+
+        likert_form = Likert_Scale_Answer_Form(request.POST)
+        text_form = Text_Answer_Form(request.POST)
+        boolean_form = Boolean_Answer_Form(request.POST)
+
+        if likert_form.is_valid() and text_form.is_valid() and boolean_form.is_valid():
+            likert_form.save(commit=True)
+            text_form.save(commit=True)
+            boolean_form.save(commit=True)
+            return HttpResponse("Response Added")
+        else:
+            print likert_form.errors and text_form.errors and boolean_form.errors
+    else:
+        survey_id = request.GET.get('survey', '')
+        email_id = request.GET.get('email', '')
+
+        survey = Survey.objects.get(title=survey_id)
+        participant = Participant.objects.get(email=email_id)
+
+        forms = []
+
+        likert_question = Question.objects.filter(question_type='likert', survey=survey)
+        text_question = Question.objects.filter(question_type='text', survey=survey)
+        boolean_question = Question.objects.filter(question_type='yes / no', survey=survey)
+
+        for question in likert_question:
+            data = {'user': participant, 'question': question}
+            f = Likert_Scale_Answer_Form(initial=data)
+            forms.append(f)
+
+        for question in text_question:
+            data = {'user': participant, 'question': question}
+            f = Text_Answer_Form(initial=data)
+            forms.append(f)
+
+        for question in boolean_question:
+            data = {'user': participant, 'question': question}
+            f = Boolean_Answer_Form(initial=data)
+            forms.append(f)
+
+        context_dict = {'likert_question': likert_question,
+                        'text_question': text_question,
+                        'boolean_question': boolean_question,
+                        'forms': forms,
+                        'survey': survey,
+                        'participant': participant,
+        }
+
+    return render_to_response('add_response.html', context_dict, context)
+
+
+# http://www.tangowithdjango.com/book/chapters/login.html
+# Create a view for login functionality
 def user_login(request):
     context = RequestContext(request)
 
@@ -227,7 +280,8 @@ def user_login(request):
         # blank dictionary object...
         return render_to_response('login.html', {}, context)
 
-# http://www.tangowithdjango.com/book/chapters/login.html - Create a view for logout functionality
+# http://www.tangowithdjango.com/book/chapters/login.html
+# Create a view for logout functionality
 def user_logout(request):
     # Since we know the user is logged in, we can now just log them out.
     logout(request)

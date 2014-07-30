@@ -89,7 +89,7 @@ class Boolean_Answer_Form(forms.ModelForm):
         model = Boolean_Answer
         fields = ('user', 'question', 'text')
 
-# class Survey_Answers_Form(forms.Form):
+# class Survey_Response_Form(forms.Form):
 
 # class UserForm(forms.ModelForm):
 #     password = forms.CharField(widget=forms.PasswordInput())

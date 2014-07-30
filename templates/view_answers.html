@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{ survey }} -  Results for {{ participant }}</h1>
+
+<br>
+
+<h2>Likert Results</h2>
+<hr>
+{% for likertresult in likert_results %}
+<p><b>{{ likertresult.question }}</b></p>
+<p>{{ likertresult }}</p>
+<hr>
+{% endfor %}
+
+
+<h2>Boolean Results</h2>
+<hr>
+{% for booleanresult in boolean_results %}
+<p><b>{{ booleanresult.question }}</b></p>
+<p>{{ booleanresult }}</p>
+<hr>
+{% endfor %}
+
+
+<h2>Text Results</h2>
+<hr>
+{% for textresult in text_results %}
+<p><b>{{ textresult.question }}</b></p>
+<p>{{ textresult }}</p>
+<hr>
+{% endfor %}
+
+{% endblock %}
