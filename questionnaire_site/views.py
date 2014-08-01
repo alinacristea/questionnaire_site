@@ -48,9 +48,6 @@ def viewAnswers(request):
                     'boolean_results': boolean_results,
                     'survey': survey,
                     'participant': participant}
-    # http://127.0.0.1:8000/view_answers/?survey=Survey4&email=participant4@gmail.com
-    # Population script: participant X & survey X with answers in the x0-x9 range
-    # (participant9, survey9, answers 90-99)
 
     return render_to_response('view_answers.html', context_dict, context)
 
@@ -86,14 +83,11 @@ def add_survey(request):
         form = SurveyForm(request.POST)
         # Have we been provided with a valid form?
         if form.is_valid():
-
-
             # user = form.cleaned_data['user']
             # title = form.cleaned_data['title']
             # description = form.cleaned_data['description']
             # deadline = form.cleaned_data['deadline']
             # Survey.objects.create(user=user, title=title, description=description, deadline=deadline)
-
 
             # Save the new survey to the database.
             form.save(commit = True)
@@ -131,7 +125,6 @@ def add_participant(request):
         if form.is_valid():
             form.save(commit = True)
             return render_to_response('index.html')
-            # return HttpResponse("Participant Added")
         else:
             print form.errors
     else:
@@ -185,22 +178,50 @@ def add_boolean_answer(request):
 
     return render_to_response('add_boolean_answer.html', {'form': form}, context)
 
-
+# http://stackoverflow.com/questions/18489393/django-submit-two-different-forms-with-one-submit-button
 def add_response(request):
     context = RequestContext(request)
+    forms = []
     if request.method == 'POST':
+        forms2 = []
+        invalid=False
+        for i in range(0, 20):
 
-        likert_form = Likert_Scale_Answer_Form(request.POST)
-        text_form = Text_Answer_Form(request.POST)
-        boolean_form = Boolean_Answer_Form(request.POST)
+            try:
+                likert_f = (Likert_Scale_Answer_Form(request.POST, prefix="formID" + str(i) ))
+                if likert_f.is_valid():
+                    forms2.append(likert_f)
+                else:
+                    invalid=True
+            except:
+                pass
 
-        if likert_form.is_valid() and text_form.is_valid() and boolean_form.is_valid():
-            likert_form.save(commit=True)
-            text_form.save(commit=True)
-            boolean_form.save(commit=True)
-            return HttpResponse("Response Added")
+            try:
+                text_f = (Text_Answer_Form(request.POST, prefix="formID" + str(i) ))
+                if text_f.is_valid():
+                    forms2.append(text_f)
+                else:
+                    invalid = True
+            except:
+                pass
+
+            try:
+                boolean_f = (Boolean_Answer_Form(request.POST, prefix="formID" + str(i) ))
+                if boolean_f.is_valid():
+                    forms2.append(boolean_f)
+                else:
+                    invalid = True
+            except:
+                pass
+
+
+        if invalid==False:
+            for form in forms2:
+                form.save(commit = True)
+            # @todo add a record of the participant responding to this survey
+            return HttpResponse("Added response!")
         else:
-            print likert_form.errors and text_form.errors and boolean_form.errors
+            return HttpResponse("Failed to Add Response!")
     else:
         survey_id = request.GET.get('survey', '')
         email_id = request.GET.get('email', '')
@@ -208,27 +229,31 @@ def add_response(request):
         survey = Survey.objects.get(title=survey_id)
         participant = Participant.objects.get(email=email_id)
 
-        forms = []
-
         likert_question = Question.objects.filter(question_type='likert', survey=survey)
         text_question = Question.objects.filter(question_type='text', survey=survey)
         boolean_question = Question.objects.filter(question_type='yes / no', survey=survey)
 
+        count = 0
         for question in likert_question:
+
             data = {'user': participant, 'question': question}
-            f = Likert_Scale_Answer_Form(initial=data)
+            f = Likert_Scale_Answer_Form(initial=data, prefix="formID"+str(count))
             forms.append(f)
+            count += 1
 
         for question in text_question:
             data = {'user': participant, 'question': question}
-            f = Text_Answer_Form(initial=data)
+            f = Text_Answer_Form(initial=data, prefix="formID"+str(count))
             forms.append(f)
+            count += 1
 
         for question in boolean_question:
             data = {'user': participant, 'question': question}
-            f = Boolean_Answer_Form(initial=data)
+            f = Boolean_Answer_Form(initial=data, prefix="formID" + str(count))
             forms.append(f)
+            count += 1
 
+        # title = 3
         context_dict = {'likert_question': likert_question,
                         'text_question': text_question,
                         'boolean_question': boolean_question,

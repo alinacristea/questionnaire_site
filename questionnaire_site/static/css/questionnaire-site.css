@@ -31,3 +31,15 @@ form ul {
 input[type="checkbox"] {
     margin-bottom: 1em;
 }
+
+/*li {*/
+  /*height: 120px;*/
+  /*display: inline-block;*/
+  /*width: 70px;*/
+  /*white-space:nowrap;*/
+/*}*/
+
+/*li label {*/
+  /*-webkit-transform: rotate(30deg);*/
+  /*margin-top: 30px;*/
+/*}*/

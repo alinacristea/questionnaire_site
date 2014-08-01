@@ -55,7 +55,7 @@ class ParticipantForm(forms.ModelForm):
 
 class Likert_Scale_Answer_Form(forms.ModelForm):
     user = forms.ModelChoiceField(queryset=Participant.objects.all(),
-                                  help_text="Select Participant")
+                                  help_text="Select Participant",widget=forms.HiddenInput)
     question = forms.ModelChoiceField(queryset=Question.objects.filter(question_type='likert'),
                                       help_text="Select the question")
     choice = forms.ChoiceField(required=True, widget=forms.RadioSelect,
@@ -68,7 +68,7 @@ class Likert_Scale_Answer_Form(forms.ModelForm):
 
 class Text_Answer_Form(forms.ModelForm):
     user = forms.ModelChoiceField(queryset=Participant.objects.all(),
-                                  help_text="Select Participant")
+                                  help_text="Select Participant", widget=forms.HiddenInput)
     question = forms.ModelChoiceField(queryset=Question.objects.filter(question_type='text'),
                                       help_text="Select the question")
     text = forms.CharField(max_length=128, help_text="Enter the question's answer")
@@ -80,7 +80,7 @@ class Text_Answer_Form(forms.ModelForm):
 
 class Boolean_Answer_Form(forms.ModelForm):
     user = forms.ModelChoiceField(queryset=Participant.objects.all(),
-                                  help_text="Select Participant")
+                                  help_text="Select Participant", widget=forms.HiddenInput)
     question = forms.ModelChoiceField(queryset=Question.objects.filter(question_type='yes / no'),
                                       help_text="Select the question")
     text = forms.BooleanField(required=False, help_text="Do you agree? If yes, check the box below!")
@@ -89,12 +89,4 @@ class Boolean_Answer_Form(forms.ModelForm):
         model = Boolean_Answer
         fields = ('user', 'question', 'text')
 
-# class Survey_Response_Form(forms.Form):
-
-# class UserForm(forms.ModelForm):
-#     password = forms.CharField(widget=forms.PasswordInput())
-#
-#     class Meta:
-#         model = User
-#         fields = ('username', 'password')
 
