@@ -103,6 +103,10 @@ class Boolean_Answer(models.Model):
     question = models.ForeignKey(Question, limit_choices_to={'question_type': 'yes / no'}, null=False, blank=False)
 
     text = models.BooleanField(verbose_name="agree")
+     # CHOICES = (
+    #     (0, 'Yes'),
+    #     (1, 'No'))
+        # choice = models.IntegerField(max_length=1, choices=CHOICES)
 
     def clean(self):
         from django.core.exceptions import ValidationError

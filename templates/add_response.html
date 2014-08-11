@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Add Response for {{ survey }} and {{ participant }}</h1>
+    <h1>Response for {{ survey }} survey and {{ participant }}
+        <hr>
+        <p> {{ survey.description }} </p> </h1>
 
     <div class="container">
 

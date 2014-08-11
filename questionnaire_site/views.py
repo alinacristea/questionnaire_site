@@ -10,6 +10,7 @@ from questionnaire_site.forms import SurveyForm, QuestionForm, ParticipantForm, 
     Likert_Scale_Answer_Form, Text_Answer_Form, Boolean_Answer_Form
 
 from django.contrib.auth import authenticate, login, logout
+from django.core.mail import send_mail, BadHeaderError
 
 # Create a view for the Home Page
 def index(request):
@@ -101,6 +102,14 @@ def add_survey(request):
     # Bad form (or form details), no form supplied...
     # Render the form with error messages (if any).
     return render_to_response('add_survey.html', {'form': form}, context)
+
+
+def delete_survey(self, request):
+    context = RequestContext(request)
+    # delete an object and redirect to main page
+    Survey.objects.get(pk=request.DELETE['pk']).delete()
+    # return HttpResponse('Deleted Survey')
+    return render_to_response('index.html', context)
 
 # Create a view to add a new question
 def add_question(request):
@@ -314,3 +323,19 @@ def user_logout(request):
     return HttpResponseRedirect('/')
 
 
+# https://docs.djangoproject.com/en/dev/topics/email/#preventing-header-injection
+
+# def send_email(request):
+#     subject = request.POST.get('Complete the following survey', '')
+#     message = request.POST.get('Please click the link below and follow the instructions', '')
+#     from_email = request.POST.get('rainbowcolours309@gmail.com', '')
+#     if subject and message and from_email:
+#         try:
+#             send_mail(subject, message, from_email, ['alina.andreea.cristea@gmail.com'])
+#         except BadHeaderError:
+#             return HttpResponse('Invalid header found.')
+#         return HttpResponseRedirect("/")
+#     else:
+#         # In reality we'd use a form class
+#         # to get proper validation errors.
+#         return HttpResponse('Make sure all fields are entered and valid.')
