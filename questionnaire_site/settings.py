@@ -37,7 +37,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'questionnaire_site'
+    'questionnaire_site',
+    'chartit',
+    'simplejson'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -90,8 +92,13 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
 )
 
+
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# DEFAULT_FROM_EMAIL = 'rainbowcolours309@gmail.com'
+# EMAIL_USE_TLS = True
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_HOST_USER = 'rainbowcolours309@gmail.com'
 # EMAIL_HOST_PASSWORD = 'ac12#$Arges'
 # EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
+# SERVER_EMAIL = 'ac12#$Arges'

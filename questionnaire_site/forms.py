@@ -51,8 +51,6 @@ class ParticipantForm(forms.ModelForm):
         model = Participant
         fields = ('email', 'birth_date', 'gender')
 
-
-
 class Likert_Scale_Answer_Form(forms.ModelForm):
     user = forms.ModelChoiceField(queryset=Participant.objects.all(),
                                   help_text="Select Participant",widget=forms.HiddenInput)
@@ -83,15 +81,10 @@ class Boolean_Answer_Form(forms.ModelForm):
                                   help_text="Select Participant", widget=forms.HiddenInput)
     question = forms.ModelChoiceField(queryset=Question.objects.filter(question_type='yes / no'),
                                       help_text="Select the question")
-    text = forms.BooleanField(required=False, help_text="Do you agree? If yes, check the box below!")
-
-    # choice = forms.ChoiceField(required=True, widget=forms.RadioSelect,
-    #                             choices=Boolean_Answer.CHOICES,
-    #                             help_text="Choose your answer")
+    text = forms.BooleanField(required=False, help_text="Select Answer!",
+                              widget=forms.RadioSelect(choices=[(True, 'Yes'),
+                                                            (False, 'No')]))
 
     class Meta:
         model = Boolean_Answer
         fields = ('user', 'question', 'text')
-        # fields = ('user', 'question', 'choice')
-
-

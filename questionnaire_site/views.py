@@ -1,6 +1,6 @@
 __author__ = 'alina'
 
-from models import Likert_Scale_Answer, Text_Answer, Boolean_Answer, Participant, Question, Survey
+from models import Likert_Scale_Answer, Text_Answer, Boolean_Answer, Participant, Question, Survey, Survey_Likert_Total
 
 
 from django import forms
@@ -11,11 +11,15 @@ from questionnaire_site.forms import SurveyForm, QuestionForm, ParticipantForm, 
 
 from django.contrib.auth import authenticate, login, logout
 from django.core.mail import send_mail, BadHeaderError
+from chartit import DataPool, Chart
+
 
 # Create a view for the Home Page
 def index(request):
-    context = RequestContext(request)
-    return render_to_response('index.html', context)
+    all_surveys = Survey.objects.all()
+    context_dict = {'all_surveys': all_surveys,}
+    return render_to_response('index.html', context_dict)
+
 
 # Creating a view for a completed questionnaire, including the participant
 # who answered the questions and their answers
@@ -104,12 +108,19 @@ def add_survey(request):
     return render_to_response('add_survey.html', {'form': form}, context)
 
 
-def delete_survey(self, request):
-    context = RequestContext(request)
-    # delete an object and redirect to main page
-    Survey.objects.get(pk=request.DELETE['pk']).delete()
-    # return HttpResponse('Deleted Survey')
-    return render_to_response('index.html', context)
+# http://stackoverflow.com/questions/4198510/delete-an-object-with-ajax-jquery-in-django
+def delete_question(request):
+        question = request.GET.get('question')
+        question_to_delete = Question.objects.get(pk=question)
+        question_to_delete.delete()
+
+        # needed to delete the likert total once a question is deleted
+        if question_to_delete.question_type == "likert":
+            question_totals_to_delete = Survey_Likert_Total.objects.get(question=question_to_delete)
+            question_totals_to_delete.delete()
+
+        return HttpResponse('OK')
+        # @TODO This should really return JSON and/or some relevant HTTP status code
 
 # Create a view to add a new question
 def add_question(request):
@@ -191,38 +202,56 @@ def add_boolean_answer(request):
 def add_response(request):
     context = RequestContext(request)
     forms = []
+
     if request.method == 'POST':
         forms2 = []
         invalid=False
+        # @TODO count the questions
+        survey_comparitor = None
         for i in range(0, 20):
-
             try:
-                likert_f = (Likert_Scale_Answer_Form(request.POST, prefix="formID" + str(i) ))
+                likert_f = (Likert_Scale_Answer_Form(request.POST, prefix="likertformID" + str(i)))
                 if likert_f.is_valid():
+                    question_des = (likert_f.cleaned_data['question'])
+                    # print question_des
+                    question = (Question.objects.get(question_description=question_des))
+                    print question
+                    survey = question.survey.title
+                    print survey
+
+                    if survey_comparitor == None:
+                        survey_comparitor = survey
+                        # print("Survey to compare set to " + survey)
+                    elif survey_comparitor != survey:
+                        print("invalid: question are from different surveys!")
+                        invalid=True
                     forms2.append(likert_f)
                 else:
+                    print("invalid here 1")
                     invalid=True
             except:
                 pass
 
             try:
-                text_f = (Text_Answer_Form(request.POST, prefix="formID" + str(i) ))
+                text_f = (Text_Answer_Form(request.POST, prefix="textformID" + str(i)))
                 if text_f.is_valid():
                     forms2.append(text_f)
                 else:
+                    print("invalid here 2")
                     invalid = True
             except:
                 pass
 
             try:
-                boolean_f = (Boolean_Answer_Form(request.POST, prefix="formID" + str(i) ))
+                boolean_f = (Boolean_Answer_Form(request.POST, prefix="boolformID" + str(i)))
                 if boolean_f.is_valid():
                     forms2.append(boolean_f)
                 else:
+                    print("invalid here 3")
+                    print boolean_f
                     invalid = True
             except:
                 pass
-
 
         if invalid==False:
             for form in forms2:
@@ -232,10 +261,11 @@ def add_response(request):
         else:
             return HttpResponse("Failed to Add Response!")
     else:
-        survey_id = request.GET.get('survey', '')
-        email_id = request.GET.get('email', '')
 
+        survey_id = request.GET.get('survey', '')
         survey = Survey.objects.get(title=survey_id)
+
+        email_id = request.GET.get('email', '')
         participant = Participant.objects.get(email=email_id)
 
         likert_question = Question.objects.filter(question_type='likert', survey=survey)
@@ -246,23 +276,22 @@ def add_response(request):
         for question in likert_question:
 
             data = {'user': participant, 'question': question}
-            f = Likert_Scale_Answer_Form(initial=data, prefix="formID"+str(count))
+            f = Likert_Scale_Answer_Form(initial=data, prefix="likertformID"+str(count))
             forms.append(f)
             count += 1
 
         for question in text_question:
             data = {'user': participant, 'question': question}
-            f = Text_Answer_Form(initial=data, prefix="formID"+str(count))
+            f = Text_Answer_Form(initial=data, prefix="textformID"+str(count))
             forms.append(f)
             count += 1
 
         for question in boolean_question:
             data = {'user': participant, 'question': question}
-            f = Boolean_Answer_Form(initial=data, prefix="formID" + str(count))
+            f = Boolean_Answer_Form(initial=data, prefix="boolformID" + str(count))
             forms.append(f)
             count += 1
 
-        # title = 3
         context_dict = {'likert_question': likert_question,
                         'text_question': text_question,
                         'boolean_question': boolean_question,
@@ -324,6 +353,7 @@ def user_logout(request):
 
 
 # https://docs.djangoproject.com/en/dev/topics/email/#preventing-header-injection
+# https://docs.djangoproject.com/en/1.3/topics/email/
 
 # def send_email(request):
 #     subject = request.POST.get('Complete the following survey', '')
@@ -331,7 +361,7 @@ def user_logout(request):
 #     from_email = request.POST.get('rainbowcolours309@gmail.com', '')
 #     if subject and message and from_email:
 #         try:
-#             send_mail(subject, message, from_email, ['alina.andreea.cristea@gmail.com'])
+#             send_mail(subject, message, from_email, ['alina.andreea.cristea@gmail.com'],  fail_silently=False)
 #         except BadHeaderError:
 #             return HttpResponse('Invalid header found.')
 #         return HttpResponseRedirect("/")
@@ -339,3 +369,75 @@ def user_logout(request):
 #         # In reality we'd use a form class
 #         # to get proper validation errors.
 #         return HttpResponse('Make sure all fields are entered and valid.')
+
+
+# http://127.0.0.1:8000/survey_stats/?survey=Survey0
+
+def survey_stats(request):
+    survey_id = request.GET.get('survey', '')  # based on survey title
+    survey = Survey.objects.get(title=survey_id)
+
+    # VARIABLES
+    title = survey.title
+    questions_number = Question.objects.filter(survey=survey).count()
+    likert_questions = Question.objects.filter(question_type="likert", survey=survey)
+
+    likert_question_names = []
+    charts = []
+
+    chartLoadString = ""
+    count = 1
+    participant_number = 0
+
+    for question in likert_questions:
+
+        chartLoadString += "container" + str(count) + ","
+        likert_answers = Likert_Scale_Answer.objects.filter(question=question)
+        likert_question_names.append(question.question_description + "<hr>")
+
+        participant_number = likert_answers.count()
+
+        ds = DataPool(
+            series=
+            [{'options': {
+                'source': Survey_Likert_Total.objects.filter(question=question).order_by("choice_id")},
+              'terms': [
+                  'choice_id','total','choice_text']}
+            ])
+
+        cht = Chart(
+            datasource=ds,
+            series_options=
+            [{'options': {
+                'type': 'column',
+                'stacking': False},
+              'terms':{
+                  'choice_text': [
+                      'total',]
+              }}],
+            chart_options=
+            {'title': {
+                'text': question.question_description},
+             'xAxis': {
+                 'reversed': False,
+                 'title': {
+                     'text': 'Likert Answers'
+                 }
+             },
+             'yAxis': {
+                 'reversed': False},
+            }
+        )
+
+        count += 1
+        charts.append(cht)
+
+        for likert_answer in likert_answers:
+            likert_question_names.append("<p>" + str(likert_answer.choice) + "</p>")
+
+    context_dict = {"charts":charts,
+                    "chartnumber": chartLoadString,
+                    "survey": survey,
+                    "participant_number":participant_number}
+
+    return render_to_response('survey_stats.html', context_dict)

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Statistics for survey {{ survey }}</h1>
+
+<div class="alert alert-info">{{ survey }} has <strong>{{ participant_number }}</strong> completed surveys</div>
+<br>
+
+    {% load chartit %}
+        {{ charts|load_charts:chartnumber }}
+
+        {% for chart in charts %}
+            {% with forloop.counter|stringformat:"s" as count %}
+            {% with "container"|add:count as template %}
+
+            <div id='{{ template}}'> Chart will be rendered here </div>
+
+            {% endwith %}
+            {% endwith %}
+        {% endfor %}
+{% endblock %}

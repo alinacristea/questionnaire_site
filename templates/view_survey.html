@@ -10,9 +10,13 @@
 
 <hr>
     {% for question in questions %}
+
+        <div id="qid-{{ question.pk }}"
         <p><b>{{ question.question_description }}</b> Type: {{ question.question_type }}</p>
         <!--<p>{{ text_result }}</p>-->
+         <a class="btn delete-question" onclick="deleteQuestion({{ question.pk }});" href="#!">Delete</a>
 <hr>
+        </div>
     {% endfor %}
 
 
@@ -101,6 +105,35 @@ $(form).submit( function() {
   return false; //prevents default action of form submit
 
 });
+
+  </script>
+
+  <script>
+
+
+
+  function deleteQuestion(pk)
+  {
+      $('#qid-' + pk).hide(); //@todo get working
+
+      $.ajax({
+          url: '/delete_question/?question=' + pk,
+          type: 'get',
+          complete: function () {
+          },
+          success: function (data) {
+
+
+              if (data != "OK") {
+                  console.log("failed!!!")
+
+              }
+              else {
+                  console.log("it worked!")
+
+              }
+          }});
+  }
 
   </script>
 

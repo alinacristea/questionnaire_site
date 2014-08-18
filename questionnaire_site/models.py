@@ -5,6 +5,7 @@ __author__ = 'alina'
 from django.db import models
 from django.contrib.auth.models import User
 import datetime
+from django.core.exceptions import ObjectDoesNotExist
 
 # class that represents a singular survey
 class Survey(models.Model):
@@ -16,7 +17,7 @@ class Survey(models.Model):
     # https://docs.djangoproject.com/en/dev/ref/forms/validation/
     def clean(self):
         from django.core.exceptions import ValidationError
-        # don't allow deadline to be before current date
+        # don't allow deadline to be before current date @TODO date picker
         if self.deadline < datetime.date.today():
             raise ValidationError("Deadlines cannot be in the past")
 
@@ -36,6 +37,22 @@ class Question(models.Model):
     question_description = models.CharField(max_length=128)
     survey = models.ForeignKey(Survey)
     question_type = models.CharField(max_length=128, choices=QUESTION_TYPES)
+
+    # override the save method
+    def save(self, *args, **kwargs):
+        # save the Question model as it is
+        super(Question, self).save(*args, **kwargs)
+        # instantiate the totals, starting with 0
+        Survey_Likert_Total.objects.create(question=self, total=0, choice_id=0,
+                                           choice_text="1 Strongly disagree")
+        Survey_Likert_Total.objects.create(question=self, total=0, choice_id=1,
+                                           choice_text="2 Disagree")
+        Survey_Likert_Total.objects.create(question=self, total=0, choice_id=2,
+                                           choice_text="3 Neither agree nor disagree")
+        Survey_Likert_Total.objects.create(question=self, total=0, choice_id=3,
+                                           choice_text="4 Agree")
+        Survey_Likert_Total.objects.create(question=self, total=0, choice_id=4,
+                                           choice_text="5 Strongly agree")
 
     def __unicode__(self):
         return (self.question_description)
@@ -66,6 +83,33 @@ class Likert_Scale_Answer(models.Model):
         (3, 'Agree'),
         (4, 'Strongly Agree') )
     choice = models.IntegerField(max_length=2, choices=CHOICES)
+
+    def save(self, *args, **kwargs):
+        current_total = 0
+        choice_text = ""
+        try:
+            question1 = Survey_Likert_Total.objects.get(question=self.question, choice_id=self.choice)
+            current_total = question1.total
+            # deleting previous object then recreating it with +1 added to the previous total
+            question1.delete()
+
+        except ObjectDoesNotExist :
+            print("does not exist!!!")
+
+        if self.choice == 0:
+            choice_text = "1 Strongly disagree"
+        if self.choice == 1:
+            choice_text = "2 Disagree"
+        if self.choice == 2:
+            choice_text = "3 Neither agree nor disagree"
+        if self.choice == 3:
+            choice_text = "4 Agree"
+        if self.choice == 4:
+            choice_text = "5 Strongly agree"
+
+        Survey_Likert_Total.objects.create(question=self.question,total=current_total+1,choice_id=self.choice,choice_text=choice_text)
+
+        super(Likert_Scale_Answer, self).save(*args, **kwargs)
 
     def clean(self):
         from django.core.exceptions import ValidationError
@@ -100,13 +144,8 @@ class Text_Answer(models.Model):
 # class that represents a boolean answer
 class Boolean_Answer(models.Model):
     user = models.ForeignKey(Participant)
-    question = models.ForeignKey(Question, limit_choices_to={'question_type': 'yes / no'}, null=False, blank=False)
-
+    question = models.ForeignKey(Question, limit_choices_to={'question_type': 'yes / no'}, null=False, blank=False,)
     text = models.BooleanField(verbose_name="agree")
-     # CHOICES = (
-    #     (0, 'Yes'),
-    #     (1, 'No'))
-        # choice = models.IntegerField(max_length=1, choices=CHOICES)
 
     def clean(self):
         from django.core.exceptions import ValidationError
@@ -122,3 +161,14 @@ class Boolean_Answer(models.Model):
             return ("yes")
         else:
             return ("no")
+
+# class to represent all likert-scale responses
+class Survey_Likert_Total(models.Model):
+    question = models.ForeignKey(Question)
+    total = models.IntegerField(default=0)
+    choice_id = models.IntegerField()
+    choice_text = models.TextField()
+
+    def __unicode__(self):
+        return (self.question.question_description + " " + " choice " + str(self.choice_id) +
+                " " + "total " + str(self.total))

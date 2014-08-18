@@ -45,7 +45,6 @@ def add_text_answer(user, question, text):
 def add_boolean_answer(user, question, text):
     b_a = Boolean_Answer.objects.get_or_create(user=user,
                                                question=question, text=text)[0]
-     # choice=choice
     return b_a
 
 
@@ -54,7 +53,7 @@ def populate():
         s = str(i)
         add_user("user-" + s, "user-" + s, "fname" + s, "lname" + s, "1", )
 
-    for i in range(5):
+    for i in range(20):
         s = str(i)
         gender = ""
         if (i % 2 == 0):
@@ -65,7 +64,7 @@ def populate():
             gender += "Female"
 
         add_participant("participant" + s + "@gmail.com", "1987-08-05", gender)
-    andrea = add_participant(email="rainbowcolours309@gmail.com", birth_date="1990-12-04", gender="Female")
+    andreea = add_participant(email="rainbowcolours309@gmail.com", birth_date="1990-12-04", gender="Female")
 
     for i in range(5):
         uid = str(i / 4)
@@ -87,33 +86,33 @@ def populate():
 
         add_question(question_description='... is reserved', survey=bfi_survey, question_type='likert')
         add_question(question_description='... is generally trusting', survey=bfi_survey, question_type='likert')
-        add_question(question_description='... tends to be lazy', survey=bfi_survey, question_type='likert')
-        add_question(question_description='... is relaxed, handles stress well', survey=bfi_survey, question_type='likert')
-        add_question(question_description='... has few artistic interests', survey=bfi_survey, question_type='likert')
-        add_question(question_description='... is outgoing, sociable', survey=bfi_survey, question_type='likert')
-        add_question(question_description='... tends to find fault with others', survey=bfi_survey, question_type='likert')
-        add_question(question_description='... does a thorough job', survey=bfi_survey, question_type='likert')
-        add_question(question_description='... gets nervous easily', survey=bfi_survey, question_type='likert')
-        add_question(question_description='... has an active imagination', survey=bfi_survey, question_type='likert')
+        # add_question(question_description='... tends to be lazy', survey=bfi_survey, question_type='likert')
+        # add_question(question_description='... is relaxed, handles stress well', survey=bfi_survey, question_type='likert')
+        # add_question(question_description='... has few artistic interests', survey=bfi_survey, question_type='likert')
+        # add_question(question_description='... is outgoing, sociable', survey=bfi_survey, question_type='likert')
+        # add_question(question_description='... tends to find fault with others', survey=bfi_survey, question_type='likert')
+        # add_question(question_description='... does a thorough job', survey=bfi_survey, question_type='likert')
+        # add_question(question_description='... gets nervous easily', survey=bfi_survey, question_type='likert')
+        # add_question(question_description='... has an active imagination', survey=bfi_survey, question_type='likert')
 
     for i in range(5):
         survey = Survey.objects.get(title="Survey" + str(i))
         questions = Question.objects.filter(survey=survey)
 
         for question in questions:
-            type = question.question_type
-            pid = Participant.objects.get(email="participant" + str(i) + "@gmail.com")
 
-            if type == "likert":
-                add_likert_scale_answer(pid, question, random.randint(0, 4))
+            for p in range(20):
+                type = question.question_type
+                pid = Participant.objects.get(email="participant" + str(p) + "@gmail.com")
 
-            if type == "text":
-                add_text_answer(pid, question, "This is my answer")
+                if type == "likert":
+                    add_likert_scale_answer(pid, question, random.randint(0, 4))
 
-            if type == "yes / no":
-                add_boolean_answer(pid, question, bool(random.getrandbits(1)))
+                if type == "text":
+                    add_text_answer(pid, question, "This is my answer")
 
-
+                if type == "yes / no":
+                    add_boolean_answer(pid, question, bool(random.getrandbits(1)))
 
 # Start execution here!
 if __name__ == '__main__':
