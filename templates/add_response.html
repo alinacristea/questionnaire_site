@@ -8,30 +8,30 @@
     <div class="container">
 
      <form class="span9" id="add_response_form" method="post" action="/add_response/">
+
        {% csrf_token %}
+
        {% for form in forms %}
-        {% csrf_token %}
-        {% for hidden in form.hidden_fields %}
-        {{ hidden }}
-        {% endfor %}
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
 
-       {% for field in form.visible_fields %}
-        {% if field.name == "question" %}
-       <!--<input type="hidden" name="question" value="{{form.question.value}}" />-->
-        {{form.question}}
-        {% else %}
+            {% for field in form.visible_fields %}
+                {% if field.name == "question" %}
+                    {{form.question.value}}
+                    {# <!--<input type="hidden" name="question" value="{{form.question.value}}" />-->#}
 
-        {{ field.errors }}
-        <p>{{ field.help_text }} </p>
-        {{ field }}
-        {% endif %}
+                    {{form.question}}
+                {% else %}
+                    {{ field.errors }}
+                    <p>{{ field.help_text }} </p>
+                    {{ field }}
+                {% endif %}
+            {% endfor %}
+                <hr>
        {% endfor %}
-
-        <hr>
-
-       {% endfor %}
-
         <br>
+
         <button class="btn btn-primary" type="submit" name="submit">Create Response</button>
 
       </form>

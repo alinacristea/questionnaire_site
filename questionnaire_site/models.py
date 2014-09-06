@@ -46,15 +46,15 @@ class Question(models.Model):
         # save the Question model as it is
         super(Question, self).save(*args, **kwargs)
         # instantiate the totals, starting with 0
-        Survey_Likert_Total.objects.create(question=self, total=0, choice_id=0,
-                                           choice_text="1 Strongly disagree")
         Survey_Likert_Total.objects.create(question=self, total=0, choice_id=1,
-                                           choice_text="2 Disagree")
+                                           choice_text="1 Strongly disagree")
         Survey_Likert_Total.objects.create(question=self, total=0, choice_id=2,
-                                           choice_text="3 Neither agree nor disagree")
+                                           choice_text="2 Disagree")
         Survey_Likert_Total.objects.create(question=self, total=0, choice_id=3,
-                                           choice_text="4 Agree")
+                                           choice_text="3 Neither agree nor disagree")
         Survey_Likert_Total.objects.create(question=self, total=0, choice_id=4,
+                                           choice_text="4 Agree")
+        Survey_Likert_Total.objects.create(question=self, total=0, choice_id=5,
                                            choice_text="5 Strongly agree")
 
     def __unicode__(self):
@@ -79,11 +79,11 @@ class Likert_Scale_Answer(models.Model):
     user = models.ForeignKey(Participant)
     question = models.ForeignKey(Question, limit_choices_to={'question_type': 'likert'})
     CHOICES = (
-        (0, 'Strongly Disagree'),
-        (1, 'Disagree'),
-        (2, 'Neither agree nor disagree'),
-        (3, 'Agree'),
-        (4, 'Strongly Agree') )
+        (1, 'Strongly disagree'),
+        (2, 'Disagree'),
+        (3, 'Neither agree nor disagree'),
+        (4, 'Agree'),
+        (5, 'Strongly agree'))
     choice = models.IntegerField(max_length=2, choices=CHOICES)
 
     # override the save() method
@@ -99,15 +99,15 @@ class Likert_Scale_Answer(models.Model):
         except ObjectDoesNotExist :
             print("does not exist!!!")
 
-        if self.choice == 0:
-            choice_text = "1 Strongly disagree"
         if self.choice == 1:
-            choice_text = "2 Disagree"
+            choice_text = "1 Strongly disagree"
         if self.choice == 2:
-            choice_text = "3 Neither agree nor disagree"
+            choice_text = "2 Disagree"
         if self.choice == 3:
-            choice_text = "4 Agree"
+            choice_text = "3 Neither agree nor disagree"
         if self.choice == 4:
+            choice_text = "4 Agree"
+        if self.choice == 5:
             choice_text = "5 Strongly agree"
 
         # recreating the object
@@ -128,7 +128,7 @@ class Likert_Scale_Answer(models.Model):
                 raise ValidationError("You may not answer the same question more than once.")
 
     def __unicode__(self):
-        return str(self.CHOICES[self.choice]) + " - " + self.user.email
+        return str(self.CHOICES[self.choice])
 
 # class to represent a text answer
 class Text_Answer(models.Model):

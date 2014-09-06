@@ -1,4 +1,4 @@
-{#http://www.tangowithdjango.com/book/chapters/templates.html#}
+{# http://www.tangowithdjango.com/book/chapters/templates.html #}
 
 <!DOCTYPE html>
 {% load staticfiles %}
@@ -6,7 +6,8 @@
     <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-{#    http://www.tangowithdjango.com/book/chapters/bootstrap.html#}
+    {# http://www.tangowithdjango.com/book/chapters/bootstrap.html#}
+    {# links to the bootstrap library #}
 
     <link href="{% static 'css/bootstrap-fluid-adj.css' %}" rel="stylesheet">
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" media="screen">
@@ -15,9 +16,8 @@
     <link href="{% static 'css/questionnaire-site.css' %}" rel="stylesheet">
 
     <script src="{% static 'js/jquery-2.1.0.min.js' %}"></script>
-      <script src="{% static 'js/highcharts.js' %}"></script>
+    <script src="{% static 'js/highcharts.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
-      <!--<script src="/questionnaire_site/static/js/bootstrap-datepicker.js"></script>-->
 
     <title>QuickSurvey - {% block title %} Surveys for researchers in psychometric field{% endblock %}</title>
     </head>
@@ -36,6 +36,8 @@
                     <div class="nav-collapse collapse">
                         <div class="nav pull-right">
                         <span class="span1">
+
+                            {# add the Home button #}
                             <a href="/" class="btn">Home</a>
                         </span>
                             {% if user.is_authenticated %}
@@ -46,6 +48,8 @@
                                     </span>
                                     <div class="needle span6 text-left">
                                         <div class="btn-group">
+
+                                            {# add buttons to add a survey, a question, a participant #}
                                             <a href="/add_survey/" class="btn">Create Survey</a>
                                             <a href="/add_question/" class="btn">Add a Question</a>
                                             <a href="/add_participant/" class="btn">Add a Participant</a>

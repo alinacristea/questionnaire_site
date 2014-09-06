@@ -1,11 +1,12 @@
 {% extends 'private_base.html' %}
 
 {% block content %}
-
+{# retrieve the survey's title and the participant who answered that survey #}
 <h1>{{ survey }} -  Results for {{ participant }}</h1>
 
 <br>
 
+{# display all likert questions and answers #}
 <h2>Likert Results</h2>
 <hr>
 {% for likertresult in likert_results %}
@@ -14,7 +15,7 @@
 <hr>
 {% endfor %}
 
-
+{# display all boolean questions and answers #}
 <h2>Boolean Results</h2>
 <hr>
 {% for booleanresult in boolean_results %}
@@ -23,7 +24,7 @@
 <hr>
 {% endfor %}
 
-
+{# display all text questions and answers #}
 <h2>Text Results</h2>
 <hr>
 {% for textresult in text_results %}

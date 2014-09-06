@@ -20,7 +20,7 @@ def index(request):
     context = RequestContext(request)
     # query the database for a list of all surveys currently stored
     all_surveys = Survey.objects.all()
-    # place the list in the context_dict dictionary which will be passed to the template
+    # place the list of surveys in the context_dict dictionary which will be passed to the template
     context_dict = {'all_surveys': all_surveys}
     # render the response and send it back to the user
     return render_to_response('index.html', context_dict, context)
@@ -128,6 +128,7 @@ def add_question(request):
             form.save(commit=True)
             # redirect to the same page to add more questions for a chosen survey
             # return HttpResponseRedirect('/add_question/')
+
             # redirect to the Home Page
             return HttpResponseRedirect('/')
         else:
@@ -215,6 +216,7 @@ def add_boolean_answer(request):
     return render_to_response('add_boolean_answer.html', {'form': form}, context)
 
 # http://stackoverflow.com/questions/18489393/django-submit-two-different-forms-with-one-submit-button
+# function to submit all answers for a survey
 def add_response(request):
     context = RequestContext(request)
     forms = []
@@ -223,37 +225,50 @@ def add_response(request):
         forms2 = []
         invalid = False
 
-        survey_comparitor = None
-        #
-        for i in range(0, 20):
+        # this is the validation section, to check if every question belongs to the correspondent survey
+        survey_toCompareWith = None
+        # the range depends on the number of questions of a survey
+        # here I have considered a maximum of 40 questions for a survey
+        for i in range(0, 40):
             try:
+                # to give each form its own name, I used the 'prefix' keyword argument
                 likert_f = (Likert_Scale_Answer_Form(request.POST, prefix="likertformID" + str(i)))
                 if likert_f.is_valid():
                     question_des = (likert_f.cleaned_data['question'])
-
                     question = (Question.objects.get(question_description=question_des))
-
                     survey = question.survey.title
 
-                    if survey_comparitor == None:
-                        survey_comparitor = survey
+                    if survey_toCompareWith==None:
+                        survey_toCompareWith=survey
 
-                    elif survey_comparitor != survey:
-                        print("invalid: question are from different surveys!")
-                        invalid=True
+                    elif survey_toCompareWith != survey:
+                        print("Questions are from different surveys!")
+                        invalid = True
                     forms2.append(likert_f)
                 else:
-                    print("invalid here 1")
-                    invalid=True
+                    print("invalid likert_form")
+                    invalid = True
+            # catching any possible error
             except:
+                # we pass any errors caught
                 pass
 
             try:
                 text_f = (Text_Answer_Form(request.POST, prefix="textformID" + str(i)))
                 if text_f.is_valid():
+                    question_des = (text_f.cleaned_data['question'])
+                    question = (Question.objects.get(question_description=question_des))
+                    survey = question.survey.title
+
+                    if survey_toCompareWith==None:
+                        survey_toCompareWith=survey
+
+                    elif survey_toCompareWith != survey:
+                        print("Questions are from different surveys!")
+                        invalid = True
                     forms2.append(text_f)
                 else:
-                    print("invalid here 2")
+                    print("invalid text_form")
                     invalid = True
             except:
                 pass
@@ -261,23 +276,34 @@ def add_response(request):
             try:
                 boolean_f = (Boolean_Answer_Form(request.POST, prefix="boolformID" + str(i)))
                 if boolean_f.is_valid():
+                    question_des = (boolean_f.cleaned_data['question'])
+                    question = (Question.objects.get(question_description=question_des))
+                    survey = question.survey.title
+
+                    if survey_toCompareWith==None:
+                        survey_toCompareWith=survey
+
+                    elif survey_toCompareWith != survey:
+                        print("Questions are from different surveys!")
+                        invalid = True
                     forms2.append(boolean_f)
                 else:
-                    print("invalid here 3")
-                    print boolean_f
+                    print("invalid boolean_form")
                     invalid = True
             except:
                 pass
 
+        # if every form is valid, then we save it with the new data added
         if invalid==False:
             for form in forms2:
                 form.save(commit = True)
-            # @todo add a record of the participant responding to this survey
             return HttpResponse("Added response!")
         else:
             return HttpResponse("Failed to Add Response!")
-    else:
 
+    # what if the request is not POST
+    # just display all the forms details
+    else:
         survey_id = request.GET.get('survey', '')
         survey = Survey.objects.get(title=survey_id)
 
@@ -292,6 +318,7 @@ def add_response(request):
         for question in likert_question:
 
             data = {'user': participant, 'question': question}
+            # I used 'initial' to declare the initial values for the form fields: participant and question
             f = Likert_Scale_Answer_Form(initial=data, prefix="likertformID"+str(count))
             forms.append(f)
             count += 1
@@ -368,40 +395,19 @@ def user_logout(request):
     return HttpResponseRedirect('/')
 
 
-# https://docs.djangoproject.com/en/dev/topics/email/#preventing-header-injection
-# https://docs.djangoproject.com/en/1.3/topics/email/
-
-# def send_email(request):
-#     subject = request.POST.get('Complete the following survey', '')
-#     message = request.POST.get('Please click the link below and follow the instructions', '')
-#     from_email = request.POST.get('rainbowcolours309@gmail.com', '')
-#     if subject and message and from_email:
-#         try:
-#             send_mail(subject, message, from_email, ['alina.andreea.cristea@gmail.com'],  fail_silently=False)
-#         except BadHeaderError:
-#             return HttpResponse('Invalid header found.')
-#         return HttpResponseRedirect("/")
-#     else:
-#         # In reality we'd use a form class
-#         # to get proper validation errors.
-#         return HttpResponse('Make sure all fields are entered and valid.')
-
-
 # http://127.0.0.1:8000/survey_stats/?survey=Survey0
-
+# adding charts functionality for the likert_scale answers
+# http://chartit.shutupandship.com/demo/chart/column-chart/
 def survey_stats(request):
-    survey_id = request.GET.get('survey', '')  # based on survey title
+    survey_id = request.GET.get('survey', '')
     survey = Survey.objects.get(title=survey_id)
 
-    # VARIABLES
-    title = survey.title
-    questions_number = Question.objects.filter(survey=survey).count()
     likert_questions = Question.objects.filter(question_type="likert", survey=survey)
 
+    # variables
     likert_question_names = []
     charts = []
-
-    chartLoadString = ""
+    chartLoadString = " "
     count = 1
     participant_number = 0
 
@@ -413,23 +419,24 @@ def survey_stats(request):
 
         participant_number = likert_answers.count()
 
+        # create a DataPool with the data we want to display
         ds = DataPool(
             series=
             [{'options': {
                 'source': Survey_Likert_Total.objects.filter(question=question).order_by("choice_id")},
               'terms': [
-                  'choice_id','total','choice_text']}
+                  'choice_id', 'total', 'choice_text']}
             ])
-
+        # create the chart object
         cht = Chart(
             datasource=ds,
             series_options=
             [{'options': {
                 'type': 'column',
                 'stacking': False},
-              'terms':{
+              'terms': {
                   'choice_text': [
-                      'total',]
+                      'total']
               }}],
             chart_options=
             {'title': {
@@ -456,4 +463,25 @@ def survey_stats(request):
                     "survey": survey,
                     "participant_number":participant_number}
 
+    # send the chart object, currently in the dictionary, to the template
     return render_to_response('survey_stats.html', context_dict)
+
+
+
+# https://docs.djangoproject.com/en/dev/topics/email/#preventing-header-injection
+# https://docs.djangoproject.com/en/1.3/topics/email/
+
+# def send_email(request):
+#     subject = request.POST.get('Complete the following survey', '')
+#     message = request.POST.get('Please click the link below and follow the instructions', '')
+#     from_email = request.POST.get('rainbowcolours309@gmail.com', '')
+#     if subject and message and from_email:
+#         try:
+#             send_mail(subject, message, from_email, ['alina.andreea.cristea@gmail.com'],  fail_silently=False)
+#         except BadHeaderError:
+#             return HttpResponse('Invalid header found.')
+#         return HttpResponseRedirect("/")
+#     else:
+#         # In reality we'd use a form class
+#         # to get proper validation errors.
+#         return HttpResponse('Make sure all fields are entered and valid.')

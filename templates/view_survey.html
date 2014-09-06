@@ -1,47 +1,56 @@
 {% extends 'private_base.html' %}
 
 {% block content %}
-<div id="view_survey">
-<div class="highlight">
+    <div id="view_survey">
+        <div class="highlight">
 
+            {# add the survey's title and description on top of the page #}
+            <h1>{{ survey }}</h1>
+            <p>{{ survey.description }}</p>
 
-<h1>{{ survey }}</h1>
-<p>{{ survey.description }}</p>
+            <hr>
 
-<hr>
-    {% for question in questions %}
+            {# display each question that belongs to a given survey and its type #}
+            {% for question in questions %}
 
-        <div id="qid-{{ question.pk }}"
-        <p><b>{{ question.question_description }}</b> Type: {{ question.question_type }}</p>
-        <!--<p>{{ text_result }}</p>-->
-         <a class="btn delete-question" onclick="deleteQuestion({{ question.pk }});" href="#!">Delete</a>
-<hr>
+                <div id="qid-{{ question.pk }}"
+                <p><b>{{ question.question_description }}</b> Type: {{ question.question_type }}</p>
+                <p>{{ text_result }}</p>
+
+                {# add the 'delete' button in case the user wants to remove a question #}
+                <a class="btn delete-question" onclick="deleteQuestion({{ question.pk }});" href="#!">Delete</a>
+
+            <hr>
+            {% endfor %}
         </div>
-    {% endfor %}
 
+    <div class="alert-area"></div>
 
-<div class="alert-area"></div>
+        </div>
+            {# include the add_question form#}
+            <form class="span6" id="question_form" method="post" action="/add_question/">
+                {% csrf_token %}
 
-</div>
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
 
-  <form class="span6" id="question_form" method="post" action="/add_question/">
-    {% csrf_token %}
-    {% for hidden in form.hidden_fields %}
-    {{ hidden }}
-    {% endfor %}
+                    {% for field in form.visible_fields %}
+                        {{ field.errors }}
+                        <p>{{ field.help_text }} </p>
+                        {{ field }}
+                    {% endfor %}
 
-    {% for field in form.visible_fields %}
-    {{ field.errors }}
-    <p>{{ field.help_text }} </p>
-    {{ field }}
-    {% endfor %}
-    <br/>
-    <button id="submit" class="btn btn-primary" type="submit" name="submit">Create Question</button>
-  </form>
-</div>
+                    <br/>
 
-      <script>
+                <button id="submit" class="btn btn-primary" type="submit" name="submit">Create Question</button>
+            </form>
+        </div>
 
+{# using JavaScript to add questions to the database, without page refresh #}
+<script>
+
+    {# variables #}
     var alertArea = $('.alert-area');
     var form = $('form#question_form');
     var desc = $('#id_question_description');
@@ -50,22 +59,19 @@
     var count = 0;
     var survey = $('h1').html();
 
-
+// retrieve the value of an object with jQuery, if the function returns true
+// http://api.jquery.com/filter/
 $('#id_survey option').filter(function() {
-  return ($(this).text() == survey); //To select Blue
+  return ($(this).text() == survey);
 }).prop('selected', true);
-
-
 
 // http://stackoverflow.com/questions/786142/how-to-retrieve-checkboxes-values-in-jquery
 $('input[type="radio"]').click(function() {
   if($(this).is(':checked')) {
-
     checkboxValue = this.getAttribute("value");
-    console.log(checkboxValue);
+    {# console.log(checkboxValue); #}
   }
 });
-
 
 // http://stackoverflow.com/questions/1200266/submit-a-form-using-jquery
 $(form).submit( function() {
@@ -74,48 +80,42 @@ $(form).submit( function() {
     type: 'post',
     data: $('form#question_form').serialize(),
     complete:function(){
-//      alert("complete");
     },
     success: function(data) {
 
-
-
       if (data != "Created Question") {
-        console.log("failed!!!")
-
+        {# console.log("failed!!!")#}
+        {# alert the user that the question has not been added #}
         $('.alert').remove();
         alertArea.prepend('<div class="alert alert-danger">Add Question failed. Please try again later.</div>');
         $('.alert').delay(2000).fadeOut(2000);
 
       }
       else {
-        console.log("it worked!")
+        {# console.log("it worked!")#}
+        {# alert the user the question was added #}
         alertArea.before('<p id="added' + count + '"><b>' + desc.val() +'</b> Type: ' + checkboxValue  + '</p><hr>');
         alertArea.prepend('<div class="alert alert-success">Added Question!</div>')
         $('.alert').delay(2000).fadeOut(2000);
         count++;
 
         desc.val("")
+        {# highlight the 'desc' element every time the event is trigerred #}
         desc.focus();
-
       }
     }
   });
-
   return false; //prevents default action of form submit
-
 });
-
-  </script>
-
-  <script>
+</script>
 
 
+{# using JavaScript to delete a question #}
+<script>
 
   function deleteQuestion(pk)
   {
-      $('#qid-' + pk).hide(); //@todo get working
-
+      $('#qid-' + pk).hide();
       $.ajax({
           url: '/delete_question/?question=' + pk,
           type: 'get',
@@ -123,18 +123,14 @@ $(form).submit( function() {
           },
           success: function (data) {
 
-
-              if (data != "OK") {
+              if (data != "Deteled Question") {
                   console.log("failed!!!")
-
               }
               else {
                   console.log("it worked!")
-
               }
           }});
   }
-
-  </script>
+</script>
 
 {% endblock %}

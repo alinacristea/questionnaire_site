@@ -4,9 +4,9 @@
     <h1>Add Boolean Answer</h1>
 
     <div class="container">
-
      <form class="span6" id="boolean_answer_form" method="post" action="/add_boolean_answer/">
          {% csrf_token %}
+
          {% for hidden in form.hidden_fields %}
          {{ hidden }}
          {% endfor %}

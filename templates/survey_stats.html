@@ -1,12 +1,15 @@
+{# http://chartit.shutupandship.com/docs/ #}
+
 {% extends 'private_base.html' %}
 
 {% block content %}
 
+{# retrieve the survey's title that we're displaying stats for #}
 <h1>Statistics for survey {{ survey }}</h1>
 
 <div class="alert alert-info">{{ survey }} has <strong>{{ participant_number }}</strong> completed surveys</div>
 <br>
-
+    {# load the chart for display #}
     {% load chartit %}
         {{ charts|load_charts:chartnumber }}
 
