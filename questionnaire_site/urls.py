@@ -5,9 +5,13 @@ admin.autodiscover()
 
 from questionnaire_site import views
 
+# the URLs created for the application
 urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
     url(r'^admin/', include(admin.site.urls)),
+
+    # when the regular expression "r'^view_survey/$'" is matched then
+    # the "views.viewSurvey" function will be called
     url(r'^view_survey/$', views.viewSurvey, name='view_survey'),
     url(r'^view_answers/$', views.viewAnswers, name='view_answers'),
 

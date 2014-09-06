@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 import datetime
 from django.core.exceptions import ObjectDoesNotExist
 
-# class that represents a singular survey
+# class to represent a Survey
 class Survey(models.Model):
     user = models.ForeignKey(User, verbose_name="Author")
     title = models.CharField(max_length=128, unique=True)
@@ -15,17 +15,20 @@ class Survey(models.Model):
     deadline = models.DateField(null=True)
 
     # https://docs.djangoproject.com/en/dev/ref/forms/validation/
+    # override the clean() method to save the model only after
+    # checking if the deadline is after the current date
     def clean(self):
         from django.core.exceptions import ValidationError
-        # don't allow deadline to be before current date @TODO date picker
+        # don't allow deadline to be before current date
         if self.deadline < datetime.date.today():
             raise ValidationError("Deadlines cannot be in the past")
 
-    # The __unicode()__ method is used to provide a unicode representation of a model instance.
+    # The __unicode()__ method is used to provide a unicode representation of a model instance
+    # here it returns the title of the survey
     def __unicode__(self):
         return (self.title)
 
-# class that represents a question
+# class to represent a Question
 class Question(models.Model):
     TEXT = 'text'
     LIKERT = 'likert'
@@ -38,7 +41,7 @@ class Question(models.Model):
     survey = models.ForeignKey(Survey)
     question_type = models.CharField(max_length=128, choices=QUESTION_TYPES)
 
-    # override the save method
+    # override the save() method
     def save(self, *args, **kwargs):
         # save the Question model as it is
         super(Question, self).save(*args, **kwargs)
@@ -57,9 +60,8 @@ class Question(models.Model):
     def __unicode__(self):
         return (self.question_description)
 
-# class that represents a participant
+# class to represent a Participant
 class Participant(models.Model):
-    # what if they change their email @TODO
     email = models.EmailField(max_length=128, null=False, unique=True)
     birth_date = models.DateField(max_length=128, null=False)
     GENDER = (
@@ -68,11 +70,11 @@ class Participant(models.Model):
         ('Other', 'other'),
     )
     gender = models.CharField(max_length=128, choices=GENDER)
-    # validated_email = models.BooleanField() @TODO
+
     def __unicode__(self):
         return (self.email)
 
-# class that represents a likert-scale answer
+# class to represent a likert-scale answer
 class Likert_Scale_Answer(models.Model):
     user = models.ForeignKey(Participant)
     question = models.ForeignKey(Question, limit_choices_to={'question_type': 'likert'})
@@ -84,6 +86,7 @@ class Likert_Scale_Answer(models.Model):
         (4, 'Strongly Agree') )
     choice = models.IntegerField(max_length=2, choices=CHOICES)
 
+    # override the save() method
     def save(self, *args, **kwargs):
         current_total = 0
         choice_text = ""
@@ -107,12 +110,16 @@ class Likert_Scale_Answer(models.Model):
         if self.choice == 4:
             choice_text = "5 Strongly agree"
 
-        Survey_Likert_Total.objects.create(question=self.question,total=current_total+1,choice_id=self.choice,choice_text=choice_text)
+        # recreating the object
+        Survey_Likert_Total.objects.create(question=self.question,total=current_total+1,
+                                           choice_id=self.choice,choice_text=choice_text)
 
         super(Likert_Scale_Answer, self).save(*args, **kwargs)
 
+    # override the clean() method
     def clean(self):
         from django.core.exceptions import ValidationError
+
         # don't allow users to answer previously answered questions
         a_list = (Likert_Scale_Answer.objects.filter(user=self.user))
 
@@ -123,7 +130,7 @@ class Likert_Scale_Answer(models.Model):
     def __unicode__(self):
         return str(self.CHOICES[self.choice]) + " - " + self.user.email
 
-# class that represents a text answer
+# class to represent a text answer
 class Text_Answer(models.Model):
     user = models.ForeignKey(Participant)
     question = models.ForeignKey(Question, limit_choices_to={'question_type': 'text'})
@@ -131,6 +138,7 @@ class Text_Answer(models.Model):
 
     def clean(self):
         from django.core.exceptions import ValidationError
+
         # don't allow users to answer previously answered questions
         a_list = (Text_Answer.objects.filter(user=self.user))
 
@@ -141,10 +149,11 @@ class Text_Answer(models.Model):
     def __unicode__(self):
         return (self.text)
 
-# class that represents a boolean answer
+# class to represent a boolean answer
 class Boolean_Answer(models.Model):
     user = models.ForeignKey(Participant)
-    question = models.ForeignKey(Question, limit_choices_to={'question_type': 'yes / no'}, null=False, blank=False,)
+    question = models.ForeignKey(Question, limit_choices_to={'question_type': 'yes / no'},
+                                 null=False, blank=False)
     text = models.BooleanField(verbose_name="agree")
 
     def clean(self):

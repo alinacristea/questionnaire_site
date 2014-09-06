@@ -1,8 +1,9 @@
 __author__ = 'alina'
 
-
+# here we add the data models that we want to be available on the Admin Interface
 from django.contrib import admin
-from questionnaire_site.models import Survey, Question, Participant, Likert_Scale_Answer, Text_Answer, Boolean_Answer, Survey_Likert_Total
+from questionnaire_site.models import Survey, Question, Participant, Likert_Scale_Answer, \
+    Text_Answer, Boolean_Answer, Survey_Likert_Total
 
 admin.site.register(Survey)
 admin.site.register(Question)

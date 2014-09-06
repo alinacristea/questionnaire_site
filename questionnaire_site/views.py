@@ -1,24 +1,29 @@
 __author__ = 'alina'
 
-from models import Likert_Scale_Answer, Text_Answer, Boolean_Answer, Participant, Question, Survey, Survey_Likert_Total
+from models import Likert_Scale_Answer, Text_Answer, Boolean_Answer, \
+    Participant, Question, Survey, Survey_Likert_Total
 
 
-from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, RequestContext
 from questionnaire_site.forms import SurveyForm, QuestionForm, ParticipantForm, \
     Likert_Scale_Answer_Form, Text_Answer_Form, Boolean_Answer_Form
 
 from django.contrib.auth import authenticate, login, logout
-from django.core.mail import send_mail, BadHeaderError
+# from django.core.mail import send_mail, BadHeaderError
 from chartit import DataPool, Chart
 
 
 # Create a view for the Home Page
 def index(request):
+    # Get the context from the HTTP request
+    context = RequestContext(request)
+    # query the database for a list of all surveys currently stored
     all_surveys = Survey.objects.all()
-    context_dict = {'all_surveys': all_surveys,}
-    return render_to_response('index.html', context_dict)
+    # place the list in the context_dict dictionary which will be passed to the template
+    context_dict = {'all_surveys': all_surveys}
+    # render the response and send it back to the user
+    return render_to_response('index.html', context_dict, context)
 
 
 # Creating a view for a completed questionnaire, including the participant
@@ -29,25 +34,30 @@ def viewAnswers(request):
     survey_id = request.GET.get('survey', '')
     email_id = request.GET.get('email', '')
 
+    # find a survey with a given survey_id retrieved before
     survey = Survey.objects.get(title=survey_id)
-
+    # find a participant with a given email_id retrieved before
     participant = Participant.objects.get(email=email_id)
+    # retrieve all the associated questions for a given survey
     questions = Question.objects.filter(survey=survey)
 
     list = []
-
+    # retrieve the answers of all types of questions for a given participant
     likert_results = Likert_Scale_Answer.objects.filter(user=participant, question=questions)
     text_results = Text_Answer.objects.filter(user=participant, question=questions)
     boolean_results = Boolean_Answer.objects.filter(user=participant, question=questions)
 
+    # add all answers and the correspondent question to an array
     for answer in likert_results:
-        list.append("<p>"  + str(answer.question.question_description) + " " + str(answer.choice) + "</p>")
+        list.append("<p>"+ str(answer.question.question_description) + " " + str(answer.choice) + "</p>")
 
     for answer in text_results:
-        list.append("<p>"  + str(answer.question.question_description) + " " + str(answer.text) + "</p>")
+        list.append("<p>"+ str(answer.question.question_description) + " " + str(answer.text) + "</p>")
 
     for answer in boolean_results:
-        list.append("<p>"  + str(answer.question.question_description) + " " + str(answer.text) + "</p>")
+        list.append("<p>"+ str(answer.question.question_description) + " " + str(answer.text) + "</p>")
+
+    # add the survey, participant and answers to a dictionary
     context_dict = {'likert_results': likert_results,
                     'text_results': text_results,
                     'boolean_results': boolean_results,
@@ -56,71 +66,58 @@ def viewAnswers(request):
 
     return render_to_response('view_answers.html', context_dict, context)
 
+
 # http://www.tangowithdjango.com/book/chapters/forms.html
+# create a view to visualise an existing survey
 def viewSurvey(request):
     context = RequestContext(request)
-
-    survey_id = request.GET.get('survey', '') # based on survey title
+    # based on survey title get a survey
+    survey_id = request.GET.get('survey', '')
+    # get all surveys with a given survey_id retrieved before
     survey = Survey.objects.get(title=survey_id)
-
+    # retrieve all questions for that survey
     questions = Question.objects.filter(survey=survey)
-
+    # display the QuestionForm
     form = QuestionForm()
     context_dict = {'questions': questions,
                     'survey': survey,
                     'form': form}
 
+    # is that a HTTP POST request?
     if request.method == 'POST':
         form = QuestionForm(request.POST)
+        # is the form provided valid?
         if form.is_valid():
+            # if yes, save the survey with the information added
             form.save(commit=True)
-            return HttpResponse ("done")
+            return HttpResponse("done")
         else:
+            # the form has errors, so print them to the terminal
             print form.errors
+
     return render_to_response('view_survey.html', context_dict, context)
+
 
 # Create a view to add a new survey
 def add_survey(request):
-    # Get the context from the request.
     context = RequestContext(request)
-    # A HTTP POST?
+
     if request.method == 'POST':
         form = SurveyForm(request.POST)
-        # Have we been provided with a valid form?
-        if form.is_valid():
-            # user = form.cleaned_data['user']
-            # title = form.cleaned_data['title']
-            # description = form.cleaned_data['description']
-            # deadline = form.cleaned_data['deadline']
-            # Survey.objects.create(user=user, title=title, description=description, deadline=deadline)
 
+        if form.is_valid():
             # Save the new survey to the database.
-            form.save(commit = True)
+            form.save(commit=True)
+            # redirect user to that survey's web page to add questions to it
             return HttpResponseRedirect('/view_survey/?survey=' + form.cleaned_data['title'])
         else:
-            # The supplied form contained errors - just print them to the terminal.
             print form.errors
     else:
-        # If the request was not a POST, display the form to enter details.
+        # If the request was not a POST, display the form
         form = SurveyForm()
     # Bad form (or form details), no form supplied...
-    # Render the form with error messages (if any).
     return render_to_response('add_survey.html', {'form': form}, context)
 
-
-# http://stackoverflow.com/questions/4198510/delete-an-object-with-ajax-jquery-in-django
-def delete_question(request):
-        question = request.GET.get('question')
-        question_to_delete = Question.objects.get(pk=question)
-        question_to_delete.delete()
-
-        # needed to delete the likert total once a question is deleted
-        if question_to_delete.question_type == "likert":
-            question_totals_to_delete = Survey_Likert_Total.objects.get(question=question_to_delete)
-            question_totals_to_delete.delete()
-
-        return HttpResponse('OK')
-        # @TODO This should really return JSON and/or some relevant HTTP status code
 
 # Create a view to add a new question
 def add_question(request):
@@ -128,14 +125,31 @@ def add_question(request):
     if request.method == 'POST':
         form = QuestionForm(request.POST)
         if form.is_valid():
-            form.save(commit = True)
-            # return render_to_response('index.html')
-            return HttpResponse("Created Question")
+            form.save(commit=True)
+            # redirect to the same page to add more questions for a chosen survey
+            # return HttpResponseRedirect('/add_question/')
+            # redirect to the Home Page
+            return HttpResponseRedirect('/')
         else:
             print form.errors
     else:
         form = QuestionForm()
     return render_to_response('add_question.html', {'form': form}, context)
+
+
+# http://stackoverflow.com/questions/4198510/delete-an-object-with-ajax-jquery-in-django
+# function to delete a question object using AJAX functionality
+def delete_question(request):
+        question = request.GET.get('question')
+        question_to_delete = Question.objects.get(pk=question)
+        question_to_delete.delete()
+
+        # for likert questions, once the question is deleted I had to delete the likert total as well
+        if question_to_delete.question_type == "likert":
+            question_totals_to_delete = Survey_Likert_Total.objects.get(question=question_to_delete)
+            question_totals_to_delete.delete()
+        return HttpResponse('OK')
+
 
 # Create a view to add a new participant
 def add_participant(request):
@@ -143,8 +157,9 @@ def add_participant(request):
     if request.method == 'POST':
         form = ParticipantForm(request.POST)
         if form.is_valid():
-            form.save(commit = True)
-            return render_to_response('index.html')
+            form.save(commit=True)
+            # redirect to the Home Page
+            return HttpResponseRedirect('/')
         else:
             print form.errors
     else:
@@ -157,8 +172,9 @@ def add_likert_scale_answer(request):
     if request.method == 'POST':
         form = Likert_Scale_Answer_Form(request.POST)
         if form.is_valid():
-            form.save(commit = True)
-            return HttpResponse("Likert Answer Added")
+            form.save(commit=True)
+            return HttpResponseRedirect('/')
+            # return HttpResponse("Likert Answer Added")
         else:
             print form.errors
     else:
@@ -172,9 +188,9 @@ def add_text_answer(request):
     if request.method == 'POST':
         form = Text_Answer_Form(request.POST)
         if form.is_valid():
-            form.save(commit = True)
-            return HttpResponse("Text Answer Added")
-            # return render_to_response('index.html')
+            form.save(commit=True)
+            return HttpResponseRedirect('/')
+            # return HttpResponse("Text Answer Added")
         else:
             print form.errors
     else:
@@ -188,9 +204,9 @@ def add_boolean_answer(request):
     if request.method == 'POST':
         form = Boolean_Answer_Form(request.POST)
         if form.is_valid():
-            form.save(commit = True)
-            return HttpResponse("Boolean Answer Added")
-            # return render_to_response('index.html')
+            form.save(commit=True)
+            return HttpResponseRedirect('/')
+            # return HttpResponse("Boolean Answer Added")
         else:
             print form.errors
     else:
@@ -205,23 +221,23 @@ def add_response(request):
 
     if request.method == 'POST':
         forms2 = []
-        invalid=False
-        # @TODO count the questions
+        invalid = False
+
         survey_comparitor = None
+        #
         for i in range(0, 20):
             try:
                 likert_f = (Likert_Scale_Answer_Form(request.POST, prefix="likertformID" + str(i)))
                 if likert_f.is_valid():
                     question_des = (likert_f.cleaned_data['question'])
-                    # print question_des
+
                     question = (Question.objects.get(question_description=question_des))
-                    print question
+
                     survey = question.survey.title
-                    print survey
 
                     if survey_comparitor == None:
                         survey_comparitor = survey
-                        # print("Survey to compare set to " + survey)
+
                     elif survey_comparitor != survey:
                         print("invalid: question are from different surveys!")
                         invalid=True

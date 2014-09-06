@@ -1,16 +1,15 @@
+/* custom css applied to the each unordered list that belongs to a 'form' element */
 form ul {
   list-style-type: none;
   margin-left: 0;
 }
 
+/* custom css applied to 'alert-area' class_selector */
 .alert-area {
   height: 58px;
 }
 
-#view_survey #id_question_description + p, #view_survey #id_survey {
-  display: none;
-}
-
+/* custom css applied to 'question_form' id_selector */
 #question_form {
     display: block;
     float: right;
@@ -22,24 +21,13 @@ form ul {
 
 .highlight {
     display: block;
-    /*float: left;*/
-    /*width: 100%;*/
     margin-right: 300px;
 }
 
+#view_survey #id_question_description + p, #view_survey #id_survey {
+  display: none;
+}
 
 input[type="checkbox"] {
     margin-bottom: 1em;
 }
-
-/*li {*/
-  /*height: 120px;*/
-  /*display: inline-block;*/
-  /*width: 70px;*/
-  /*white-space:nowrap;*/
-/*}*/
-
-/*li label {*/
-  /*-webkit-transform: rotate(30deg);*/
-  /*margin-top: 30px;*/
-/*}*/

@@ -4,12 +4,11 @@ __author__ = 'alina'
 
 from django import forms
 import datetime
-from django.contrib.auth.models import User
-from questionnaire_site.models import Survey, Question, User, Participant, Likert_Scale_Answer, Text_Answer, Boolean_Answer
+from questionnaire_site.models import Survey, Question, User, Participant,\
+    Likert_Scale_Answer, Text_Answer, Boolean_Answer
 
-
+# creating a form that corresponds to the Survey data model
 class SurveyForm(forms.ModelForm):
-    # user will need to be authenticate @TODO
     user = forms.ModelChoiceField(queryset=User.objects.all(),
                                   help_text="Select Author")
     title = forms.CharField(max_length=128,
@@ -27,6 +26,7 @@ class SurveyForm(forms.ModelForm):
         fields = ('user', 'title', 'description', 'deadline')
 
 
+#  creating a form that corresponds to the Question data model
 class QuestionForm(forms.ModelForm):
     question_description = forms.CharField(max_length=128,
                                            help_text="Enter the question")
@@ -40,6 +40,8 @@ class QuestionForm(forms.ModelForm):
         model = Question
         fields = ('question_description', 'survey', 'question_type')
 
+
+# creating a form that corresponds to the Participant data model
 class ParticipantForm(forms.ModelForm):
     email = forms.EmailField(max_length=128, help_text="Enter your email")
     birth_date = forms.DateField(help_text="Enter your Date of Birth")
@@ -51,6 +53,8 @@ class ParticipantForm(forms.ModelForm):
         model = Participant
         fields = ('email', 'birth_date', 'gender')
 
+
+# creating a form that corresponds to the Likert_Scale_Answer data model
 class Likert_Scale_Answer_Form(forms.ModelForm):
     user = forms.ModelChoiceField(queryset=Participant.objects.all(),
                                   help_text="Select Participant",widget=forms.HiddenInput)
@@ -64,6 +68,7 @@ class Likert_Scale_Answer_Form(forms.ModelForm):
         fields = ('user', 'question', 'choice')
 
 
+# creating a form that corresponds to the Text_Answer data model
 class Text_Answer_Form(forms.ModelForm):
     user = forms.ModelChoiceField(queryset=Participant.objects.all(),
                                   help_text="Select Participant", widget=forms.HiddenInput)
@@ -76,6 +81,7 @@ class Text_Answer_Form(forms.ModelForm):
         fields = ('user', 'question', 'text')
 
 
+# creating a form that corresponds to the Boolean_Answer data model
 class Boolean_Answer_Form(forms.ModelForm):
     user = forms.ModelChoiceField(queryset=Participant.objects.all(),
                                   help_text="Select Participant", widget=forms.HiddenInput)

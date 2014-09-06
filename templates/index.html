@@ -1,22 +1,22 @@
-{% extends 'base.html' %}
+{% extends 'private_base.html' %}
 
 {% block content %}
 <div class="hero-unit" xmlns="http://www.w3.org/1999/html">
-  <h1>QuickSurvey</h1>
+  <h1>Welcome to QuickSurvey</h1>
   <br>
   <div class="container">
 
-        <p><a href="/add_survey/">Create Survey</a></p>
-        <p><a href="/add_question/">Add Question</a></p>
-        <p><a href="/add_participant/">Add Participant</a></p>
-
-        <br>
-
-        <p><a href="/add_likert_scale_answer/">Add Likert</a></p>
-        <p><a href="/add_text_answer/">Add Text</a></p>
-        <p><a href="/add_boolean_answer/">Add Boolean</a></p>
-
-        <br>
+{#        <p><a href="/add_survey/">Create Survey</a></p>#}
+{#        <p><a href="/add_question/">Add Question</a></p>#}
+{#        <p><a href="/add_participant/">Add Participant</a></p>#}
+{##}
+{#        <br>#}
+{##}
+{#        <p><a href="/add_likert_scale_answer/">Add Likert</a></p>#}
+{#        <p><a href="/add_text_answer/">Add Text</a></p>#}
+{#        <p><a href="/add_boolean_answer/">Add Boolean</a></p>#}
+{##}
+{#        <br>#}
 
         <p><a href="http://127.0.0.1:8000/add_response/?survey=BFI-10&email=participant0@gmail.com">
             Add Response</a></p>
@@ -24,6 +24,8 @@
             A Completed Survey</a></p>
 
     <h2>Active Surveys</h2>
+
+    {#    get each survey from the list with all surveys#}
     {% for survey in all_surveys %}
       <p><a href="/view_survey/?survey={{ survey.title }}">{{ survey.title }}</a>
           <a class="btn" href="/survey_stats/?survey={{ survey.title }}">View Stats</a></p>
