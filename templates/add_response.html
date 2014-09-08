@@ -18,9 +18,6 @@
 
             {% for field in form.visible_fields %}
                 {% if field.name == "question" %}
-                    {{form.question.value}}
-                    {# <!--<input type="hidden" name="question" value="{{form.question.value}}" />-->#}
-
                     {{form.question}}
                 {% else %}
                     {{ field.errors }}

@@ -56,7 +56,7 @@ def populate():
         add_user("user-" + s, "user-" + s, "fname" + s, "lname" + s, "1", )
 
     # add random participants
-    for i in range(20):
+    for i in range(10):
         s = str(i)
         gender = ""
         if (i % 2 == 0):
@@ -96,13 +96,13 @@ def populate():
         add_question(question_description='... is reserved', survey=bfi_survey, question_type='likert')
         add_question(question_description='... is generally trusting', survey=bfi_survey, question_type='likert')
         add_question(question_description='... tends to be lazy', survey=bfi_survey, question_type='likert')
-        # add_question(question_description='... is relaxed, handles stress well', survey=bfi_survey, question_type='likert')
-        # add_question(question_description='... has few artistic interests', survey=bfi_survey, question_type='likert')
-        # add_question(question_description='... is outgoing, sociable', survey=bfi_survey, question_type='likert')
-        # add_question(question_description='... tends to find fault with others', survey=bfi_survey, question_type='likert')
-        # add_question(question_description='... does a thorough job', survey=bfi_survey, question_type='likert')
-        # add_question(question_description='... gets nervous easily', survey=bfi_survey, question_type='likert')
-        # add_question(question_description='... has an active imagination', survey=bfi_survey, question_type='likert')
+        add_question(question_description='... is relaxed, handles stress well', survey=bfi_survey, question_type='likert')
+        add_question(question_description='... has few artistic interests', survey=bfi_survey, question_type='likert')
+        add_question(question_description='... is outgoing, sociable', survey=bfi_survey, question_type='likert')
+        add_question(question_description='... tends to find fault with others', survey=bfi_survey, question_type='likert')
+        add_question(question_description='... does a thorough job', survey=bfi_survey, question_type='likert')
+        add_question(question_description='... gets nervous easily', survey=bfi_survey, question_type='likert')
+        add_question(question_description='... has an active imagination', survey=bfi_survey, question_type='likert')
 
     # add random likert_scale, text and boolean answers
     for i in range(5):
@@ -111,12 +111,12 @@ def populate():
 
         for question in questions:
 
-            for p in range(20):
+            for p in range(10):
                 type = question.question_type
                 pid = Participant.objects.get(email="participant" + str(p) + "@gmail.com")
 
                 if type == "likert":
-                    add_likert_scale_answer(pid, question, random.randint(0, 4))
+                    add_likert_scale_answer(pid, question, random.randint(1, 5))
 
                 if type == "text":
                     add_text_answer(pid, question, "This is my answer")
@@ -135,4 +135,3 @@ if __name__ == '__main__':
 
     # the populate() function calls the other functions, add_user, add_survey, add_participant, add_question, etc
     populate()
-

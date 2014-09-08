@@ -126,11 +126,10 @@ def add_question(request):
         form = QuestionForm(request.POST)
         if form.is_valid():
             form.save(commit=True)
+
             # redirect to the same page to add more questions for a chosen survey
             # return HttpResponseRedirect('/add_question/')
-
-            # redirect to the Home Page
-            return HttpResponseRedirect('/')
+            return HttpResponse("Created Question")
         else:
             print form.errors
     else:
@@ -160,7 +159,9 @@ def add_participant(request):
         if form.is_valid():
             form.save(commit=True)
             # redirect to the Home Page
-            return HttpResponseRedirect('/')
+            # return HttpResponseRedirect('/')
+            # redirect to the same page to add more questions for a chosen survey
+            return HttpResponseRedirect('/add_participant/')
         else:
             print form.errors
     else:
@@ -297,9 +298,10 @@ def add_response(request):
         if invalid==False:
             for form in forms2:
                 form.save(commit = True)
-            return HttpResponse("Added response!")
+                # @todo better response; after the message, maybe the user can be redirected to another page...
+            return HttpResponse("Thank you for completing this survey, your answers have been added!")
         else:
-            return HttpResponse("Failed to Add Response!")
+            return HttpResponse("Please check that you have answered all questions and try again. ")
 
     # what if the request is not POST
     # just display all the forms details
@@ -399,6 +401,7 @@ def user_logout(request):
 # adding charts functionality for the likert_scale answers
 # http://chartit.shutupandship.com/demo/chart/column-chart/
 def survey_stats(request):
+    context = RequestContext(request)
     survey_id = request.GET.get('survey', '')
     survey = Survey.objects.get(title=survey_id)
 
@@ -464,24 +467,4 @@ def survey_stats(request):
                     "participant_number":participant_number}
 
     # send the chart object, currently in the dictionary, to the template
-    return render_to_response('survey_stats.html', context_dict)
-
-
-
-# https://docs.djangoproject.com/en/dev/topics/email/#preventing-header-injection
-# https://docs.djangoproject.com/en/1.3/topics/email/
-
-# def send_email(request):
-#     subject = request.POST.get('Complete the following survey', '')
-#     message = request.POST.get('Please click the link below and follow the instructions', '')
-#     from_email = request.POST.get('rainbowcolours309@gmail.com', '')
-#     if subject and message and from_email:
-#         try:
-#             send_mail(subject, message, from_email, ['alina.andreea.cristea@gmail.com'],  fail_silently=False)
-#         except BadHeaderError:
-#             return HttpResponse('Invalid header found.')
-#         return HttpResponseRedirect("/")
-#     else:
-#         # In reality we'd use a form class
-#         # to get proper validation errors.
-#         return HttpResponse('Make sure all fields are entered and valid.')
+    return render_to_response('survey_stats.html', context_dict, context)

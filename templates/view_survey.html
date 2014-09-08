@@ -15,14 +15,14 @@
 
                 <div id="qid-{{ question.pk }}"
                 <p><b>{{ question.question_description }}</b> Type: {{ question.question_type }}</p>
-                <p>{{ text_result }}</p>
+                <!--<p>{{ text_result }}</p>-->
 
                 {# add the 'delete' button in case the user wants to remove a question #}
                 <a class="btn delete-question" onclick="deleteQuestion({{ question.pk }});" href="#!">Delete</a>
-
-            <hr>
+                <hr>
+                </div>
             {% endfor %}
-        </div>
+
 
     <div class="alert-area"></div>
 
@@ -123,7 +123,7 @@ $(form).submit( function() {
           },
           success: function (data) {
 
-              if (data != "Deteled Question") {
+              if (data != "Deleted Question") {
                   console.log("failed!!!")
               }
               else {

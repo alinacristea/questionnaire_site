@@ -44,7 +44,7 @@ class QuestionForm(forms.ModelForm):
 # creating a form that corresponds to the Participant data model
 class ParticipantForm(forms.ModelForm):
     email = forms.EmailField(max_length=128, help_text="Enter participant's email")
-    birth_date = forms.DateField(help_text="Enter participant's Date of Birth")
+    birth_date = forms.DateField(help_text="Enter participant's Date of Birth (format YYYY-MM-DD")
     gender = forms.ChoiceField(required=True, widget=forms.RadioSelect,
                                     choices=Participant.GENDER,
                                     help_text="Choose gender")

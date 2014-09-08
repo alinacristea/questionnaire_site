@@ -7,28 +7,26 @@
   <br>
   <div class="container">
 
-{#        <p><a href="/add_survey/">Create Survey</a></p>#}
-{#        <p><a href="/add_question/">Add Question</a></p>#}
-{#        <p><a href="/add_participant/">Add Participant</a></p>#}
-{##}
-{#        <br>#}
-{##}
-{#        <p><a href="/add_likert_scale_answer/">Add Likert</a></p>#}
-{#        <p><a href="/add_text_answer/">Add Text</a></p>#}
-{#        <p><a href="/add_boolean_answer/">Add Boolean</a></p>#}
-{##}
-{#        <br>#}
+{# added for testing purposes #}
+{# to add a response for another survey-participant pair the survey's title #}
+{#      and the participant's email will have to change #}
 
-        <p><a href="http://127.0.0.1:8000/add_response/?survey=BFI-10&email=participant0@gmail.com">
-            Add Response</a></p>
-        <p><a href="http://127.0.0.1:8000/view_answers/?survey=Survey0&email=participant0@gmail.com">
-            A Completed Survey</a></p>
+{#        <p><a href="http://127.0.0.1:8000/add_response/?survey=BFI-10&email=participant0@gmail.com">#}
+{#            Add Response for BFI-10 Survey and Participant0</a></p>#}
+{# or #}
+{#        <p><a href="http://127.0.0.1:8000/add_response/?survey=BFI-10&email=participant4@gmail.com">#}
+{#            Add Response for BFI-10 Survey and Participant4</a></p>#}
 
-    <h2>Active Surveys</h2>
+{#        <p><a href="http://127.0.0.1:8000/view_answers/?survey=Survey0&email=participant0@gmail.com">#}
+{#            Survey0 completed by Participant0</a></p>#}
+{# or #}
+{#        <p><a href="http://127.0.0.1:8000/view_answers/?survey=Survey3&email=participant4@gmail.com">#}
+{#             Survey3 completed by Participant4</a></p>#}
 
+    <h2>This is a list of all active surveys</h2>
     {#    get each survey from the list with all surveys#}
     {% for survey in all_surveys %}
-      <p><a href="/view_survey/?survey={{ survey.title }}">{{ survey.title }}</a>
+      <p>Review <a href="/view_survey/?survey={{ survey.title }}">{{ survey.title }}</a>
           <a class="btn" href="/survey_stats/?survey={{ survey.title }}">View Stats</a></p>
     {% endfor %}
 

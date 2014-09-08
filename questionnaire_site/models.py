@@ -128,7 +128,7 @@ class Likert_Scale_Answer(models.Model):
                 raise ValidationError("You may not answer the same question more than once.")
 
     def __unicode__(self):
-        return str(self.CHOICES[self.choice])
+        return str(self.choice)
 
 # class to represent a text answer
 class Text_Answer(models.Model):
