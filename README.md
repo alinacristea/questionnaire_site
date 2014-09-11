@@ -6,19 +6,19 @@ This is a django project designed to allow researchers in psychometrics to condu
 Features
 --------
 
-*create surveys
-*add participants
-*add/delete questions using AJAX functionality
-*collect individual and collective answers
-*view survey statistics (column charts)
+* create surveys
+* add participants
+* add/delete questions using AJAX functionality
+* collect individual and collective answers
+* view survey statistics (column charts)
 
 Requirements
 ------------
 
-*Django Version 1.6.5.
-*Python version 2.7 or higher
-*django_chartit
-*simplejson
+* Django Version 1.6.5.
+* Python version 2.7 or higher
+* django_chartit
+* simplejson
 
 Screenshots
 -----------
