@@ -298,7 +298,6 @@ def add_response(request):
         if invalid==False:
             for form in forms2:
                 form.save(commit = True)
-                # @todo better response; after the message, maybe the user can be redirected to another page...
             return HttpResponse("Thank you for completing this survey, your answers have been added!")
         else:
             return HttpResponse("Please check that you have answered all questions and try again. ")
