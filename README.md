@@ -1,5 +1,5 @@
-QuickSurvey (Online Surveys)
-============================
+QuickSurvey 
+===========
 
 This is a django project designed to allow researchers in psychometrics to conduct online surveys.
 
